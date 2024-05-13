@@ -40,7 +40,7 @@ const routes = [
   { path: '/users/careditform/:restaurantId', name: 'CarEditForm', element: CarEditForm },
   { path: '/users/publication', name: 'Publication', element: Publication },
   { path: '/users/publicationform', name: 'PublicationForm', element: PublicationForm },
-  { path: '/users/publicationeditform/:restaurantId', name: 'PublicationEditForm', element: PublicationEditForm },
+  { path: '/users/publicationeditform/:publicationId', name: 'PublicationEditForm', element: PublicationEditForm },
   { path: '/users/user', name: 'User', element: User },
   { path: '/users/userform', name: 'UserForm', element: UserForm },
   { path: '/users/usereditform/:restaurantId', name: 'UserEditForm', element: UserEditForm }
