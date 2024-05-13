@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';   
+import { useNavigate } from 'react-router-dom';
 import CIcon from '@coreui/icons-react';
 import Axios from 'axios';
 import {
@@ -14,40 +14,46 @@ import {
 import {
   cilPencil,
   cilTrash
-} from '@coreui/icons'
+} from '@coreui/icons'
 
-const Restaurant = () => {
+const Community = () => {
 
-  const [restaurantData, setRestaurantData] = useState([]);
+  const [communityData, setCommunityData] = useState([]);
   const navigate = useNavigate();
 
-  useEffect(()=>{
-    const getRestaurants = async() =>{
-      const response = await Axios({
-        url: 'http://localhost:1337/api/listrestaurant'
-      });
-      const listRestaurants = Object.keys(response.data).map(i=> response.data[i]);
-      setRestaurantData(listRestaurants.flat());
+  useEffect(() => {
+    const getCommunities = async () => {
+      try {
+        const response = await Axios({
+          url: 'http://localhost:1337/api/listCommunity'
+        });
+        const listCommunities = Object.keys(response.data).map(i => response.data[i]);
+        setCommunityData(listCommunities.flat());
+        console.log("Community Data:", listCommunities.flat());
+      } catch (error) {
+        console.error("Error fetching communities:", error);
+      }
     }
+  
+    getCommunities();
+  }, []);
+  
 
-    getRestaurants();
-  },[]);
-
-  function handleCreateRestaurant(event){
-    navigate('/restaurants/restaurantform');
+  function handleCreateCommunities() {
+    navigate('/communities/communityform');
   }
 
-  function handleEditRestaurant(restaurantId){
-    navigate(`/restaurants/restauranteditform/${restaurantId}`)
+  function handleEditCommunity(communityId) {
+    navigate(`/communities/communityeditform/${communityId}`)
   }
 
-  const handleDisableRestaurant = async(restaurantId) => {
-    try{
-      var url = "http://localhost:1337/api/disablerestaurant/"+restaurantId;
+  const handleDisableCommunity = async (communityId) => {
+    try {
+      var url = `http://localhost:1337/api/disableCommunity/${communityId}`;
       const response = await Axios.put(url);
       window.location.reload();
     }
-    catch(e){
+    catch (e) {
       console.log(e)
     }
   }
@@ -55,30 +61,22 @@ const Restaurant = () => {
   const columns = [
     {
       title: 'Name',
-      dataIndex: 'restaurantName'
+      dataIndex: 'communityName'
     },
     {
-      title: 'NIT',
-      dataIndex: 'restaurantNit'
+      title: 'Creator',
+      dataIndex: 'communityCreator'
     },
     {
-      title: 'Address',
-      dataIndex: 'restaurantAddress'
-    },
-    {
-      title: 'Phone',
-      dataIndex: 'restaurantPhone'
-    },
-    {
-      title: 'City',
-      dataIndex: 'cityId'
+      title: 'Description',
+      dataIndex: 'communityDescription'
     },
     {
       title: 'Options',
       render: (text, record) => (
         <div>
-          <CButton onClick={() => handleEditRestaurant(record.restaurantId)}><CIcon icon={cilPencil}/></CButton>
-          <CButton onClick={() => handleDisableRestaurant(record.restaurantId)}><CIcon icon={cilTrash}/></CButton>
+          <CButton onClick={() => handleEditCommunity(record.communityId)}><CIcon icon={cilPencil} /></CButton>
+          <CButton onClick={() => handleDisableCommunity(record.communityId)}><CIcon icon={cilTrash} /></CButton>
         </div>
       )
     }
@@ -86,7 +84,7 @@ const Restaurant = () => {
 
   return (
     <div>
-      <CButton onClick={handleCreateRestaurant}>New Restaurant</CButton>
+      <CButton onClick={handleCreateCommunities}>New Community</CButton>
       <CTable>
         <CTableHead>
           <CTableRow>
@@ -96,11 +94,11 @@ const Restaurant = () => {
           </CTableRow>
         </CTableHead>
         <CTableBody>
-          {restaurantData.map((restaurant, index) => (
+          {communityData.map((community, index) => (
             <CTableRow key={index}>
               {columns.map((column, columnIndex) => (
                 <CTableDataCell key={columnIndex}>
-                  {column.render ? column.render(restaurant[column.dataIndex], restaurant) : restaurant[column.dataIndex]}
+                  {column.render ? column.render(community[column.dataIndex], community) : community[column.dataIndex]}
                 </CTableDataCell>
               ))}
             </CTableRow>
@@ -111,4 +109,4 @@ const Restaurant = () => {
   )
 }
 
-export default Restaurant
+export default Community;

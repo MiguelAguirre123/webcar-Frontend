@@ -48,8 +48,7 @@ const _nav = [
         to: '/customers/product'
       }
     ]
-  },
-  {
+  },{
     component: CNavGroup,
     name: 'Users',
     to: '/users',

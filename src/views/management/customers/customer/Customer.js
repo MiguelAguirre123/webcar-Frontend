@@ -14,36 +14,36 @@ import {
 import {
   cilPencil,
   cilTrash
-} from '@coreui/icons'
+} from '@coreui/icons'
 
-const Restaurant = () => {
+const Customer = () => {
 
-  const [restaurantData, setRestaurantData] = useState([]);
+  const [customerData, setcustomerData] = useState([]);
   const navigate = useNavigate();
 
   useEffect(()=>{
-    const getRestaurants = async() =>{
+    const getcustomer = async() =>{
       const response = await Axios({
-        url: 'http://localhost:1337/api/listrestaurant'
+        url: 'http://localhost:1337/api/listCustomer'
       });
-      const listRestaurants = Object.keys(response.data).map(i=> response.data[i]);
-      setRestaurantData(listRestaurants.flat());
+      const listCustomers = Object.keys(response.data).map(i=> response.data[i]);
+      setcustomerData(listCustomers.flat());
     }
 
-    getRestaurants();
+    getcustomer();
   },[]);
 
-  function handleCreateRestaurant(event){
-    navigate('/restaurants/restaurantform');
+  function handleCreateCustomers(event){
+    navigate('/customers/customerForm');
   }
 
-  function handleEditRestaurant(restaurantId){
-    navigate(`/restaurants/restauranteditform/${restaurantId}`)
+  function handleEditCustomer(customerId){
+    navigate(`/customers/CustomerEditForm/${customerId}`)
   }
 
-  const handleDisableRestaurant = async(restaurantId) => {
+  const handleDisableCustomer = async(customerId) => {
     try{
-      var url = "http://localhost:1337/api/disablerestaurant/"+restaurantId;
+      var url = "http://localhost:1337/api/disableCustomer/"+customerId;
       const response = await Axios.put(url);
       window.location.reload();
     }
@@ -55,30 +55,31 @@ const Restaurant = () => {
   const columns = [
     {
       title: 'Name',
-      dataIndex: 'restaurantName'
-    },
-    {
-      title: 'NIT',
-      dataIndex: 'restaurantNit'
-    },
-    {
-      title: 'Address',
-      dataIndex: 'restaurantAddress'
+      dataIndex: 'customerName'
     },
     {
       title: 'Phone',
-      dataIndex: 'restaurantPhone'
+      dataIndex: 'customerPhone'
     },
     {
-      title: 'City',
-      dataIndex: 'cityId'
+      title: 'Description',
+      dataIndex: 'customerDescrip'
     },
     {
+      title: 'Address',
+      dataIndex: 'customerAddress'
+    },
+    {
+      title: 'Email',
+      dataIndex: 'customerEmail'
+    },
+    {
+
       title: 'Options',
       render: (text, record) => (
         <div>
-          <CButton onClick={() => handleEditRestaurant(record.restaurantId)}><CIcon icon={cilPencil}/></CButton>
-          <CButton onClick={() => handleDisableRestaurant(record.restaurantId)}><CIcon icon={cilTrash}/></CButton>
+          <CButton onClick={() => handleEditCustomer(record.customerId)}><CIcon icon={cilPencil}/></CButton>
+          <CButton onClick={() => handleDisableCustomer(record.customerId)}><CIcon icon={cilTrash}/></CButton>
         </div>
       )
     }
@@ -86,7 +87,7 @@ const Restaurant = () => {
 
   return (
     <div>
-      <CButton onClick={handleCreateRestaurant}>New Restaurant</CButton>
+      <CButton onClick={handleCreateCustomers}>New Customer</CButton>
       <CTable>
         <CTableHead>
           <CTableRow>
@@ -96,11 +97,11 @@ const Restaurant = () => {
           </CTableRow>
         </CTableHead>
         <CTableBody>
-          {restaurantData.map((restaurant, index) => (
+          {customerData.map((customer, index) => (
             <CTableRow key={index}>
               {columns.map((column, columnIndex) => (
                 <CTableDataCell key={columnIndex}>
-                  {column.render ? column.render(restaurant[column.dataIndex], restaurant) : restaurant[column.dataIndex]}
+                  {column.render ? column.render(customer[column.dataIndex], customer) : customer[column.dataIndex]}
                 </CTableDataCell>
               ))}
             </CTableRow>
@@ -111,4 +112,4 @@ const Restaurant = () => {
   )
 }
 
-export default Restaurant
+export default Customer
