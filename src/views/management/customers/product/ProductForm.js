@@ -11,7 +11,7 @@ import {
 
 
 const ProductForm = () => {
-ñ
+
     const [productData, setProductData] = useState({
         productId: '',
         productName:'',

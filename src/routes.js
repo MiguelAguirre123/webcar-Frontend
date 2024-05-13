@@ -37,13 +37,13 @@ const routes = [
   { path: '/users', name: 'Users', exact: true },
   { path: '/users/car', name: 'Car', element: Car },
   { path: '/users/carform', name: 'CarForm', element: CarForm },
-  { path: '/users/careditform/:restaurantId', name: 'CarEditForm', element: CarEditForm },
+  { path: '/users/careditform/:carId', name: 'CarEditForm', element: CarEditForm },
   { path: '/users/publication', name: 'Publication', element: Publication },
   { path: '/users/publicationform', name: 'PublicationForm', element: PublicationForm },
   { path: '/users/publicationeditform/:publicationId', name: 'PublicationEditForm', element: PublicationEditForm },
   { path: '/users/user', name: 'User', element: User },
   { path: '/users/userform', name: 'UserForm', element: UserForm },
-  { path: '/users/usereditform/:restaurantId', name: 'UserEditForm', element: UserEditForm }
+  { path: '/users/usereditform/:userId', name: 'UserEditForm', element: UserEditForm }
 ]
 
 export default routes
