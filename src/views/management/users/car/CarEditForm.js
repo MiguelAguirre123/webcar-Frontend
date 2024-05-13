@@ -8,7 +8,7 @@ import {
     CButton
 } from '@coreui/react';
 
-const CarForm = () => {
+const CarEditForm = () => {
     const { carId } = useParams(); // Obtener carId de los parámetros de la URL
 
     const [carData, setCarData] = useState({
@@ -112,4 +112,4 @@ const CarForm = () => {
     );
 };
 
-export default CarForm;
+export default CarEditForm;
