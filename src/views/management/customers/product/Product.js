@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';   
+import { useNavigate, useParams } from 'react-router-dom';   
 import CIcon from '@coreui/icons-react';
 import Axios from 'axios';
 import {
@@ -14,36 +14,41 @@ import {
 import {
   cilPencil,
   cilTrash
-} from '@coreui/icons'
+} from '@coreui/icons'
 
 const Product = () => {
 
-  const [productData, setproductData] = useState([]);
+  const [productData, setProductData] = useState([]);
   const navigate = useNavigate();
+  const { customerId } = useParams();
 
   useEffect(()=>{
-    const getProduct = async() =>{
+    const getProducts = async() =>{
       const response = await Axios({
-        url: 'http://localhost:1337/api/listProduct'
+        url: `http://localhost:1337/api/listproduct/${customerId}`
       });
-      const listproduct = Object.keys(response.data).map(i=> response.data[i]);
-      setproductData(listproduct.flat());
+      const listProducts = Object.keys(response.data).map(i=> response.data[i]);
+      setProductData(listProducts.flat());
     }
 
-    getProduct();
+    getProducts();
   },[]);
 
   function handleCreateProduct(event){
-    navigate('/products/productsFrom');
+    navigate(`/customers/productform/${customerId}`);
   }
 
-  function handleEditProduct(productId){
-    navigate(`/products/productsFrom/${productId}`)
+  function handleEditProduct(ProductId){
+    navigate(`/customers/producteditform/${ProductId}`)
   }
 
-  const handleDisableProduct = async(productId) => {
+  function handleReturn(event){
+    navigate('/customers/productbycustomer/');
+  }
+
+  const handleDisableProduct = async(ProductId) => {
     try{
-      var url = "http://localhost:1337/api/disableproduct/"+productId;
+      var url = "http://localhost:1337/api/disableProduct/" + ProductId;
       const response = await Axios.put(url);
       window.location.reload();
     }
@@ -53,10 +58,6 @@ const Product = () => {
   }
 
   const columns = [
-    {
-      title: 'Id',
-      dataIndex: 'productId'
-    },
     {
       title: 'Name',
       dataIndex: 'productName'
@@ -82,7 +83,8 @@ const Product = () => {
 
   return (
     <div>
-      <CButton onClick={handleCreateProduct}>New product</CButton>
+      <CButton onClick={handleCreateProduct}> New Product </CButton>
+      <CButton onClick={handleReturn}> Return </CButton>
       <CTable>
         <CTableHead>
           <CTableRow>
@@ -92,7 +94,7 @@ const Product = () => {
           </CTableRow>
         </CTableHead>
         <CTableBody>
-          {productData .map((product, index) => (
+          {productData.map((product, index) => (
             <CTableRow key={index}>
               {columns.map((column, columnIndex) => (
                 <CTableDataCell key={columnIndex}>
@@ -107,4 +109,4 @@ const Product = () => {
   )
 }
 
-export default Product
+export default Product;

@@ -33,6 +33,7 @@ const UserForm = () => {
     }
 
     const handleSubmit = async(event)=>{
+        event.preventDefault();
         try{
             const response = await Axios.post('http://localhost:1337/api/createuser', userData);
             console.log(response.data);

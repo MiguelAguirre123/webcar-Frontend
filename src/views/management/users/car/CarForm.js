@@ -32,6 +32,7 @@ const CarForm = () => {
     }
 
     const handleSubmit = async(event)=>{
+        event.preventDefault();
         try{
             const response = await Axios.post('http://localhost:1337/api/createcar', carData);
             console.log(response.data);

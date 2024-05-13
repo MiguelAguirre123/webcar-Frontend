@@ -50,6 +50,7 @@ const CarEditForm = () => {
     }
 
     const handleSubmit = async (event) => {
+        event.preventDefault();
         try {
             const response = await Axios.put(`http://localhost:1337/api/updatecar/${carId}`, carData);
             console.log(response.data);

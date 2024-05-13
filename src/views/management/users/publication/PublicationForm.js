@@ -8,13 +8,12 @@ import {
     CFormSelect,
     CButton
 } from '@coreui/react'
-import Publication from './Publication';
 
 const PublicationForm = () => {
 
     const [publicationData, setPublicationData] = useState({
         publicationContent: '',
-        userId: 0
+        userId: ''
     });
     const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState('');
@@ -65,13 +64,15 @@ const PublicationForm = () => {
 
     return(
         <CForm className="row g-3" onSubmit={handleSubmit}>
-            <CCol xs={4}>
-                <CFormSelect id="userOptions" label = "User" value={ selectedUser} onChange={handleSelectUsers} >
-                    <option value="">Select a user</option>
-                    {users.map(user =>(
-                        <option key={user.userId} value={user.userId}>{user.userName}</option>
-                    ))}
-                </CFormSelect>
+            <CCol md={6}>
+                <CFormInput 
+                    type="text" 
+                    id="userId" 
+                    name="userId" 
+                    label="User" 
+                    value={publicationData.userId} 
+                    onChange={handleChange} 
+                />
             </CCol>
             <CCol md={12}>
                 <CFormInput type="text" id="publicationContent" name="publicationContent" label="Description" value={publicationData.publicationContent} onChange={handleChange} />
