@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+/*import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';   
 import CIcon from '@coreui/icons-react';
 import Axios from 'axios';
@@ -111,4 +111,4 @@ const Restaurant = () => {
   )
 }
 
-export default Restaurant
+export default Restaurant*/

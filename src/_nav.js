@@ -51,19 +51,6 @@ const _nav = [
   },
   {
     component: CNavGroup,
-    name: 'Sales',
-    to: '/sales',
-    icon: <CIcon icon={cilFastfood} customClassName="nav-icon" />,
-    items: [
-      {
-        component: CNavItem,
-        name: 'Sale',
-        to: '/sales/sale'
-      }
-    ]
-  },
-  {
-    component: CNavGroup,
     name: 'Users',
     to: '/users',
     icon: <CIcon icon={cilFastfood} customClassName="nav-icon" />,
