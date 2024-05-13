@@ -26,7 +26,7 @@ const routes = [
   { path: '/communities', name: 'Communities', exact: true },
   { path: '/communities/community', name: 'Community', element: Community },
   { path: '/communities/communityform', name: 'CommunityForm', element: CommunityForm },
-  { path: '/communities/communityeditform/:restaurantId', name: 'CommunityEditForm', element: CommunityEditForm },
+  { path: '/communities/communityeditform/:communityId', name: 'CommunityEditForm', element: CommunityEditForm },
   { path: '/customers', name: 'Customers', exact: true },
   { path: '/customers/customer', name: 'Customer', element: Customer },
   { path: '/customers/customerform', name: 'CustomerForm', element: CustomerForm },
