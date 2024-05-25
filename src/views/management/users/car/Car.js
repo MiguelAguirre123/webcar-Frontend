@@ -14,36 +14,36 @@ import {
 import {
   cilPencil,
   cilTrash
-} from '@coreui/icons'
+} from '@coreui/icons'
 
-const Restaurant = () => {
+const Car = () => {
 
-  const [restaurantData, setRestaurantData] = useState([]);
+  const [carData, setCarData] = useState([]);
   const navigate = useNavigate();
 
   useEffect(()=>{
-    const getRestaurants = async() =>{
+    const getCars = async() =>{
       const response = await Axios({
-        url: 'http://localhost:1337/api/listrestaurant'
+        url: 'http://localhost:1337/api/listcar'
       });
-      const listRestaurants = Object.keys(response.data).map(i=> response.data[i]);
-      setRestaurantData(listRestaurants.flat());
+      const listcars = Object.keys(response.data).map(i=> response.data[i]);
+      setCarData(listcars.flat());
     }
 
-    getRestaurants();
+    getCars();
   },[]);
 
-  function handleCreateRestaurant(event){
-    navigate('/restaurants/restaurantform');
+  function handleCreateCar(event){
+    navigate('/users/carform');
   }
 
-  function handleEditRestaurant(restaurantId){
-    navigate(`/restaurants/restauranteditform/${restaurantId}`)
+  function handleEditCar(carId){
+    navigate(`/users/careditform/${carId}`)
   }
 
-  const handleDisableRestaurant = async(restaurantId) => {
+  const handleDisableCar = async(carId) => {
     try{
-      var url = "http://localhost:1337/api/disablerestaurant/"+restaurantId;
+      var url = "http://localhost:1337/api/disablecar/" + carId;
       const response = await Axios.put(url);
       window.location.reload();
     }
@@ -55,30 +55,26 @@ const Restaurant = () => {
   const columns = [
     {
       title: 'Name',
-      dataIndex: 'restaurantName'
+      dataIndex: 'carName'
     },
     {
-      title: 'NIT',
-      dataIndex: 'restaurantNit'
+      title: 'Model',
+      dataIndex: 'carModel'
     },
     {
-      title: 'Address',
-      dataIndex: 'restaurantAddress'
+      title: 'Brand',
+      dataIndex: 'carBrand'
     },
     {
-      title: 'Phone',
-      dataIndex: 'restaurantPhone'
-    },
-    {
-      title: 'City',
-      dataIndex: 'cityId'
-    },
+      title: 'User',
+      dataIndex: 'userId'
+    }, 
     {
       title: 'Options',
       render: (text, record) => (
         <div>
-          <CButton onClick={() => handleEditRestaurant(record.restaurantId)}><CIcon icon={cilPencil}/></CButton>
-          <CButton onClick={() => handleDisableRestaurant(record.restaurantId)}><CIcon icon={cilTrash}/></CButton>
+          <CButton onClick={() => handleEditCar(record.carId)}><CIcon icon={cilPencil}/></CButton>
+          <CButton onClick={() => handleDisableCar(record.carId)}><CIcon icon={cilTrash}/></CButton>
         </div>
       )
     }
@@ -86,7 +82,7 @@ const Restaurant = () => {
 
   return (
     <div>
-      <CButton onClick={handleCreateRestaurant}>New Restaurant</CButton>
+      <CButton onClick={handleCreateCar}> New Car </CButton>
       <CTable>
         <CTableHead>
           <CTableRow>
@@ -96,11 +92,11 @@ const Restaurant = () => {
           </CTableRow>
         </CTableHead>
         <CTableBody>
-          {restaurantData.map((restaurant, index) => (
+          {carData.map((car, index) => (
             <CTableRow key={index}>
               {columns.map((column, columnIndex) => (
                 <CTableDataCell key={columnIndex}>
-                  {column.render ? column.render(restaurant[column.dataIndex], restaurant) : restaurant[column.dataIndex]}
+                  {column.render ? column.render(car[column.dataIndex], car) : car[column.dataIndex]}
                 </CTableDataCell>
               ))}
             </CTableRow>
@@ -111,4 +107,4 @@ const Restaurant = () => {
   )
 }
 
-export default Restaurant
+export default Car;

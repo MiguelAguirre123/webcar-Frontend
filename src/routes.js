@@ -8,6 +8,7 @@ const Customer = React.lazy(() => import('./views/management/customers/customer/
 const CustomerForm = React.lazy(() => import('./views/management/customers/customer/CustomerForm'))
 const CustomerEditForm = React.lazy(() => import('./views/management/customers/customer/CustomerEditForm'))
 const Product = React.lazy(() => import('./views/management/customers/product/Product'))
+const ProductByCustomer = React.lazy(() => import('./views/management/customers/product/ProductByCustomer'))
 const ProductForm = React.lazy(() => import('./views/management/customers/product/ProductForm'))
 const ProductEditForm = React.lazy(() => import('./views/management/customers/product/ProductEditForm'))
 const Car = React.lazy(() => import('./views/management/users/car/Car'))
@@ -31,19 +32,20 @@ const routes = [
   { path: '/customers/customer', name: 'Customer', element: Customer },
   { path: '/customers/customerform', name: 'CustomerForm', element: CustomerForm },
   { path: '/customers/customereditform/:customerId', name: 'CustomerEditForm', element: CustomerEditForm },
-  { path: '/customers/product', name: 'Product', element: Product },
-  { path: '/customers/productform', name: 'ProductForm', element: ProductForm },
+  { path: '/customers/product/:customerId', name: 'Product', element: Product },
+  { path: '/customers/productbycustomer', name: 'ProductByCustomer', element: ProductByCustomer },
+  { path: '/customers/productform/:customerId', name: 'ProductForm', element: ProductForm },
   { path: '/customers/producteditform/:productId', name: 'ProductEditForm', element: ProductEditForm },
   { path: '/users', name: 'Users', exact: true },
   { path: '/users/car', name: 'Car', element: Car },
   { path: '/users/carform', name: 'CarForm', element: CarForm },
-  { path: '/users/careditform/:restaurantId', name: 'CarEditForm', element: CarEditForm },
+  { path: '/users/careditform/:carId', name: 'CarEditForm', element: CarEditForm },
   { path: '/users/publication', name: 'Publication', element: Publication },
   { path: '/users/publicationform', name: 'PublicationForm', element: PublicationForm },
   { path: '/users/publicationeditform/:publicationId', name: 'PublicationEditForm', element: PublicationEditForm },
   { path: '/users/user', name: 'User', element: User },
   { path: '/users/userform', name: 'UserForm', element: UserForm },
-  { path: '/users/usereditform/:restaurantId', name: 'UserEditForm', element: UserEditForm }
+  { path: '/users/usereditform/:userId', name: 'UserEditForm', element: UserEditForm }
 ]
 
 export default routes

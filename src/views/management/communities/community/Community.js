@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';   
 import CIcon from '@coreui/icons-react';
 import Axios from 'axios';
 import {
@@ -108,5 +108,4 @@ const Community = () => {
     </div>
   )
 }
-
 export default Community;

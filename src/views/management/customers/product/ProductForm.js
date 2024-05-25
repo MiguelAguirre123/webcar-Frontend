@@ -9,39 +9,37 @@ import {
     CButton
 } from '@coreui/react'
 
-
 const ProductForm = () => {
-ñ
+
     const [productData, setProductData] = useState({
-        productId: '',
-        productName:'',
+        productName: '',
         productDescription: '',
-        productPrice:'',
-        customerId:''
-
+        productPrice: '',
+        customerId: '',
     });
-
     const navigate = useNavigate();
+    const { customerId } = useParams();
 
-    function handleChange(event) {
-        const { name, value } = event.target;
+    function handleChange(event){
+        const {name, value} = event.target;
         setProductData({
             ...productData,
             [name]: value
         });
     }
 
-    function handleReturn(event) {
-        navigate('/products/product');
+    function handleReturn(event){
+        navigate(`/customers/product/${customerId}`);
     }
 
-    const handleSubmit = async (event) => {
-        try {
-            const response = await Axios.post('http://localhost:1337/api/createproduct', productData);
+    const handleSubmit = async(event)=>{
+        event.preventDefault();
+        try{
+            const response = await Axios.post('http://localhost:1337/api/createProduct', productData);
             console.log(response.data);
-            navigate('');
+            navigate(`/customers/product/${customerId}`);
         }
-        catch (e) {
+        catch (e){
             console.log(e);
         }
     }
@@ -49,24 +47,54 @@ const ProductForm = () => {
     return (
         <CForm className="row g-3" onSubmit={handleSubmit}>
             <CCol md={6}>
-                <CFormInput type="text" id="productName" name="productName" label="Name" value={productData.productName} onChange={handleChange} />
+                <CFormInput 
+                    type="text" 
+                    id="productName" 
+                    name="productName" 
+                    label="Name" 
+                    value={productData.productName} 
+                    onChange={handleChange} 
+                />
             </CCol>
             <CCol md={6}>
-                <CFormInput type="text" id="productDescription" name="productDescription" label="Description" value={productData.productDescription} onChange={handleChange} />
+                <CFormInput 
+                    type="text" 
+                    id="productDescription" 
+                    name="productDescription" 
+                    label="Description" 
+                    value={productData.productDescription} 
+                    onChange={handleChange} 
+                />
             </CCol>
-            <CCol xs={6}>
-                <CFormInput type="text" id="productPrice" name="productPrice" label="Price" value={productData.productPrice} onChange={handleChange} />
+            <CCol md={6}>
+                <CFormInput 
+                    type="text" 
+                    id="productPrice" 
+                    name="productPrice" 
+                    label="Price" 
+                    value={productData.productPrice} 
+                    onChange={handleChange} 
+                />
             </CCol>
-            <CCol xs={6}>
+            <CCol md={6}>
+                <CFormInput 
+                    type="text" 
+                    id="customerId" 
+                    name="customerId" 
+                    label="User" 
+                    value={productData.customerId} 
+                    onChange={handleChange} 
+                />
             </CCol>
-            <CCol xs={6}>
+            <CCol md={6}></CCol>
+            <CCol md={1}>
                 <CButton color="primary" type="submit"> Save </CButton>
             </CCol>
-            <CCol xs={6}>
+            <CCol md={1}>
                 <CButton color="secondary" onClick={handleReturn}>Cancel</CButton>
             </CCol>
         </CForm>
-    )
+    );
 }
 
 export default ProductForm

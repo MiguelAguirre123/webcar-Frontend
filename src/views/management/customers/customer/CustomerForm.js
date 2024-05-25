@@ -36,6 +36,7 @@ const CustomerForm = () => {
     }
 
     const handleSubmit = async (event) => {
+        event.preventDefault();
         try {
             const response = await Axios.post('http://localhost:1337/api/createCustomer', customerData);
             console.log(response.data);
