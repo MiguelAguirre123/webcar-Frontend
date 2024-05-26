@@ -17,7 +17,6 @@ import {
 } from '@coreui/icons'
 
 const Community = () => {
-
   const [communityData, setCommunityData] = useState([]);
   const navigate = useNavigate();
 
@@ -36,8 +35,7 @@ const Community = () => {
     }
   
     getCommunities();
-  }, []);
-  
+  }, [navigate]);
 
   function handleCreateCommunities() {
     navigate('/communities/communityform');

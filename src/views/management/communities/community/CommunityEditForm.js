@@ -5,7 +5,6 @@ import {
     CForm,
     CCol,
     CFormInput,
-    CFormSelect,
     CButton
 } from '@coreui/react'
 

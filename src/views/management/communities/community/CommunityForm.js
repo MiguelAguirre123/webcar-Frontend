@@ -5,12 +5,10 @@ import {
     CForm,
     CCol,
     CFormInput,
-    CFormSelect,
     CButton
 } from '@coreui/react'
 
 const CommunityForm = () => {
-
     const { communityId } = useParams();
     const [communityData, setCommunityData] = useState({
         communityName: '',
@@ -22,7 +20,6 @@ const CommunityForm = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-
         const getCommunity = async () => {
             const response = await Axios({ url: `http://localhost:1332/api/getCommunity/${communityId}` })
             const community = response.data.data
