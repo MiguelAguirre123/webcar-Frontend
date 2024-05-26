@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';   
+import { useNavigate, useParams } from 'react-router-dom';   
 import CIcon from '@coreui/icons-react';
 import Axios from 'axios';
 import {
@@ -14,36 +14,41 @@ import {
 import {
   cilPencil,
   cilTrash
-} from '@coreui/icons'
+} from '@coreui/icons'
 
-const Restaurant = () => {
+const Product = () => {
 
-  const [restaurantData, setRestaurantData] = useState([]);
+  const [productData, setProductData] = useState([]);
   const navigate = useNavigate();
+  const { customerId } = useParams();
 
   useEffect(()=>{
-    const getRestaurants = async() =>{
+    const getProducts = async() =>{
       const response = await Axios({
-        url: 'http://localhost:1337/api/listrestaurant'
+        url: `http://localhost:1337/api/listproduct/${customerId}`
       });
-      const listRestaurants = Object.keys(response.data).map(i=> response.data[i]);
-      setRestaurantData(listRestaurants.flat());
+      const listProducts = Object.keys(response.data).map(i=> response.data[i]);
+      setProductData(listProducts.flat());
     }
 
-    getRestaurants();
+    getProducts();
   },[]);
 
-  function handleCreateRestaurant(event){
-    navigate('/restaurants/restaurantform');
+  function handleCreateProduct(event){
+    navigate(`/customers/productform/${customerId}`);
   }
 
-  function handleEditRestaurant(restaurantId){
-    navigate(`/restaurants/restauranteditform/${restaurantId}`)
+  function handleEditProduct(ProductId){
+    navigate(`/customers/producteditform/${ProductId}`)
   }
 
-  const handleDisableRestaurant = async(restaurantId) => {
+  function handleReturn(event){
+    navigate('/customers/productbycustomer/');
+  }
+
+  const handleDisableProduct = async(ProductId) => {
     try{
-      var url = "http://localhost:1337/api/disablerestaurant/"+restaurantId;
+      var url = "http://localhost:1337/api/disableProduct/" + ProductId;
       const response = await Axios.put(url);
       window.location.reload();
     }
@@ -55,30 +60,22 @@ const Restaurant = () => {
   const columns = [
     {
       title: 'Name',
-      dataIndex: 'restaurantName'
+      dataIndex: 'productName'
     },
     {
-      title: 'NIT',
-      dataIndex: 'restaurantNit'
+      title: 'Description',
+      dataIndex: 'productDescription'
     },
     {
-      title: 'Address',
-      dataIndex: 'restaurantAddress'
-    },
-    {
-      title: 'Phone',
-      dataIndex: 'restaurantPhone'
-    },
-    {
-      title: 'City',
-      dataIndex: 'cityId'
+      title: 'Price',
+      dataIndex: 'productPrice'
     },
     {
       title: 'Options',
       render: (text, record) => (
         <div>
-          <CButton onClick={() => handleEditRestaurant(record.restaurantId)}><CIcon icon={cilPencil}/></CButton>
-          <CButton onClick={() => handleDisableRestaurant(record.restaurantId)}><CIcon icon={cilTrash}/></CButton>
+          <CButton onClick={() => handleEditProduct(record.productId)}><CIcon icon={cilPencil}/></CButton>
+          <CButton onClick={() => handleDisableProduct(record.productId)}><CIcon icon={cilTrash}/></CButton>
         </div>
       )
     }
@@ -86,7 +83,8 @@ const Restaurant = () => {
 
   return (
     <div>
-      <CButton onClick={handleCreateRestaurant}>New Restaurant</CButton>
+      <CButton onClick={handleCreateProduct}> New Product </CButton>
+      <CButton onClick={handleReturn}> Return </CButton>
       <CTable>
         <CTableHead>
           <CTableRow>
@@ -96,11 +94,11 @@ const Restaurant = () => {
           </CTableRow>
         </CTableHead>
         <CTableBody>
-          {restaurantData.map((restaurant, index) => (
+          {productData.map((product, index) => (
             <CTableRow key={index}>
               {columns.map((column, columnIndex) => (
                 <CTableDataCell key={columnIndex}>
-                  {column.render ? column.render(restaurant[column.dataIndex], restaurant) : restaurant[column.dataIndex]}
+                  {column.render ? column.render(product[column.dataIndex], product) : product[column.dataIndex]}
                 </CTableDataCell>
               ))}
             </CTableRow>
@@ -111,4 +109,4 @@ const Restaurant = () => {
   )
 }
 
-export default Restaurant
+export default Product;

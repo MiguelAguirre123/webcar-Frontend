@@ -3,7 +3,15 @@ import CIcon from '@coreui/icons-react'
 import {
   cilDescription,
   cilSpeedometer,
-  cilFastfood
+  cilGroup,
+  cilUser,
+  cilUserPlus,
+  cilAddressBook,
+  cilContact,
+  cilPlaylistAdd,
+  cilBasket,
+  cilBook,
+  cilBusAlt
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
@@ -22,12 +30,13 @@ const _nav = [
     component: CNavGroup,
     name: 'Communities',
     to: '/communities',
-    icon: <CIcon icon={cilFastfood} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilGroup} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
         name: 'Community',
-        to: '/communities/community'
+        to: '/communities/community',
+        icon: <CIcon icon={cilBook} customClassName="nav-icon" />,
       }
     ]
   },
@@ -35,53 +44,44 @@ const _nav = [
     component: CNavGroup,
     name: 'Customers',
     to: '/customers',
-    icon: <CIcon icon={cilFastfood} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilAddressBook} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
         name: 'Customer',
-        to: '/customers/customer'
+        to: '/customers/customer',
+        icon: <CIcon icon={cilContact} customClassName="nav-icon" />,
       },
       {
         component: CNavItem,
         name: 'Product',
-        to: '/customers/product'
+        to: '/customers/productbycustomer',
+        icon: <CIcon icon={cilBasket} customClassName="nav-icon" />,
       }
     ]
-  },
-  {
-    component: CNavGroup,
-    name: 'Sales',
-    to: '/sales',
-    icon: <CIcon icon={cilFastfood} customClassName="nav-icon" />,
-    items: [
-      {
-        component: CNavItem,
-        name: 'Sale',
-        to: '/sales/sale'
-      }
-    ]
-  },
-  {
+  },{
     component: CNavGroup,
     name: 'Users',
     to: '/users',
-    icon: <CIcon icon={cilFastfood} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilUserPlus} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
         name: 'Car',
-        to: '/users/car'
+        to: '/users/car',
+        icon: <CIcon icon={cilBusAlt} customClassName="nav-icon" />,
       },
       {
         component: CNavItem,
         name: 'Publication',
-        to: '/users/publication'
+        to: '/users/publication',
+        icon: <CIcon icon={cilPlaylistAdd} customClassName="nav-icon" />,
       },
       {
         component: CNavItem,
         name: 'User',
-        to: '/users/user'
+        to: '/users/user',
+        icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
       }
     ]
   },

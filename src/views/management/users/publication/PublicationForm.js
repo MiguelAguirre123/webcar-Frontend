@@ -9,106 +9,88 @@ import {
     CButton
 } from '@coreui/react'
 
-const RestaurantForm = () => {
+const PublicationForm = () => {
 
-    const [restaurantData, setRestaurantData] = useState({
-        restaurantName: '',
-        restaurantNit: '',
-        restaurantAddress:'',
-        restaurantPhone: '',
-        cityId: 0
+    const [publicationData, setPublicationData] = useState({
+        publicationContent: '',
+        userId: ''
     });
-    const [departments, setDepartments] = useState([]);
-    const [selectedDepartment, setSelectedDepartment] = useState('');
-    const [cities, setCities] = useState([]);
-    const [selectedCity, setSelectedCity] = useState('');
+    const [users, setUsers] = useState([]);
+    const [selectedUser, setSelectedUser] = useState('');
     const navigate = useNavigate();
 
     useEffect(()=>{
-        const getDepartments = async () => {
-            const response = await Axios({url:`http://localhost:1337/api/listdepartment`});
-            const lstDepartments = Object.keys(response.data).map(i=> response.data[i]);
-            setDepartments(lstDepartments.flat());
+        /*
+        const getUsers = async () => {
+            const response = await Axios({url:`http://localhost:1337/api/listuser`});
+            const lstUsers = Object.keys(response.data).map(i=> response.data[i]);
+            setUsers(lstUsers.flat());
         }
+        
 
-        const getCities = async(departmentId)=>{
-            const response = await Axios({url:`http://localhost:1337/api/listcity/${departmentId}`});
-            const lstCities = Object.keys(response.data).map(i=> response.data[i]);
-            setCities(lstCities.flat());
-        }
+        getUsers();
+        */
 
-        getDepartments();
+    },[selectedUser]);
 
-        if(selectedDepartment !== "")
-            getCities(selectedDepartment);
-
-    },[selectedDepartment]);
-
-    function handleSelectDepartments(event){
-        setSelectedDepartment(event.target.value);
-    }
-
-    function handleSelectCities(event){
-        setSelectedCity(event.target.value);
-        setRestaurantData({
-            ...restaurantData,
-            cityId: event.target.value
+    function handleSelectUsers(event){
+        setSelectedUser(event.target.value);
+        setPublicationData({
+            ...publicationData,
+            userId: parseInt(event.target.value)
         })
     }
 
     function handleChange(event){
         const {name, value} = event.target;
-        setRestaurantData({
-            ...restaurantData,
+        setPublicationData({
+            ...publicationData,
             [name]: value
         });
     }
 
     function handleReturn(event){
-        navigate('/restaurants/restaurant');
+        navigate('/users/publication');
     }
 
     const handleSubmit = async(event)=>{
         event.preventDefault();
-        try{
-            const response = await Axios.post('http://localhost:1337/api/createrestaurant', restaurantData);
+        try {
+            // Obtener el token del localStorage o de las cookies
+            const token = localStorage.getItem('token'); // Suponiendo que hayas almacenado el token en el localStorage
+    
+            // Configurar los headers de la solicitud para incluir el token
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`, // Incluir el token en el encabezado Authorization
+                    'Content-Type': 'application/json'
+                }
+            };
+    
+            // Realizar la solicitud POST con los datos de la publicación y la configuración de los headers
+            const response = await Axios.post('http://localhost:1337/api/createpublication', publicationData, config);
             console.log(response.data);
-            navigate('/restaurants/restaurant');
-        }
-        catch (e){
+            navigate('/users/publication');
+        } catch (e) {
             console.log(e);
+            navigate('/login');
         }
     }
 
     return(
         <CForm className="row g-3" onSubmit={handleSubmit}>
-            <CCol md={12}>
-                <CFormInput type="text" id="restaurantName" name="restaurantName" label="Name" value={restaurantData.restaurantName} onChange={handleChange} />
+            <CCol md={6}>
+                <CFormInput 
+                    type="text" 
+                    id="userId" 
+                    name="userId" 
+                    label="User" 
+                    value={publicationData.userId} 
+                    onChange={handleChange} 
+                />
             </CCol>
             <CCol md={12}>
-                <CFormInput type="text" id="restaurantNit" name="restaurantNit" label="Nit" value={restaurantData.restaurantNit} onChange={handleChange} />
-            </CCol>
-            <CCol xs={4}>
-                <CFormSelect id="departmentOptions" label = "Department" value={ selectedDepartment} onChange={handleSelectDepartments} >
-                    <option value="">Select a department</option>
-                    {departments.map(opcion =>(
-                        <option key={opcion.value} value={opcion.value}>{opcion.label}</option>
-                    ))}
-                </CFormSelect>
-            </CCol>
-            <CCol xs={4}>
-                <CFormSelect id="cityOptions" label = "City" value={ selectedCity} onChange={handleSelectCities} >
-                    <option value="">Select a city</option>
-                    {cities.map(opcion =>(
-                        <option key={opcion.value} value={opcion.value}>{opcion.label}</option>
-                    ))}
-                </CFormSelect>
-            </CCol>
-            <CCol xs={4}>
-                <CFormInput type="text" id="restaurantAddress" name="restaurantAddress" label="Address" value={restaurantData.restaurantAddress} onChange={handleChange} />
-            </CCol>
-            <CCol md={12}>
-                <CFormInput type="text" id="restaurantPhone" name="restaurantPhone" label="Phone" value={restaurantData.restaurantPhone} onChange={handleChange} />
+                <CFormInput type="text" id="publicationContent" name="publicationContent" label="Description" value={publicationData.publicationContent} onChange={handleChange} />
             </CCol>
             <CCol xs={6}>
                 <CButton color="primary" type="submit" >Save</CButton>
@@ -120,4 +102,4 @@ const RestaurantForm = () => {
     )
 }
 
-export default RestaurantForm
+export default PublicationForm
