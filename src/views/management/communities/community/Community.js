@@ -23,17 +23,35 @@ const Community = () => {
   useEffect(() => {
     const getCommunities = async () => {
       try {
-        const response = await Axios({
-          url: 'http://localhost:1337/api/listCommunity'
-        });
+        // Obtener el token del localStorage
+        const token = localStorage.getItem('token');
+
+        // Verificar si hay un token almacenado
+        if (!token) {
+          console.log("Token not found in localStorage");
+          navigate('/login');
+          return;
+        }
+
+        // Configurar los headers de la solicitud para incluir el token
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        };
+
+        // Realizar la solicitud GET con la configuración de los headers
+        const response = await Axios.get('http://localhost:1337/api/listCommunity', config);
         const listCommunities = Object.keys(response.data).map(i => response.data[i]);
         setCommunityData(listCommunities.flat());
         console.log("Community Data:", listCommunities.flat());
       } catch (error) {
         console.error("Error fetching communities:", error);
+        navigate('/login');
       }
-    }
-  
+    };
+
     getCommunities();
   }, [navigate]);
 
@@ -47,14 +65,42 @@ const Community = () => {
 
   const handleDisableCommunity = async (communityId) => {
     try {
-      var url = `http://localhost:1337/api/disableCommunity/${communityId}`;
-      const response = await Axios.put(url);
-      window.location.reload();
+      // Obtener el token del localStorage
+      const token = localStorage.getItem('token');
+
+      // Verificar si hay un token almacenado
+      if (!token) {
+        console.log("Token not found in localStorage");
+        navigate('/login');
+        return;
+      }
+
+      // Configurar los headers de la solicitud para incluir el token
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      };
+
+      // Construir la URL completa para la solicitud PUT
+      const url = `http://localhost:1337/api/disableCommunity/${communityId}`;
+
+      // Enviar la solicitud PUT al servidor para deshabilitar la comunidad
+      const response = await Axios.put(url, {}, config);
+
+      // Verificar si la respuesta es exitosa
+      if (response.status === 200) {
+        console.log("Community disabled successfully");
+        window.location.reload();
+      } else {
+        console.log("Error disabling community:", response.statusText);
+      }
+    } catch (error) {
+      console.log("Error:", error.message);
+      navigate('/login');
     }
-    catch (e) {
-      console.log(e)
-    }
-  }
+  };
 
   const columns = [
     {
@@ -106,4 +152,5 @@ const Community = () => {
     </div>
   )
 }
+
 export default Community;

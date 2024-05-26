@@ -21,19 +21,47 @@ const CommunityEditForm = () => {
 
     useEffect(() => {
         const getCommunity = async () => {
-            const response = await Axios({ url: `http://localhost:1337/api/getCommunity/${communityId}` })
-            const community = response.data.data
-            setCommunityData(community);
-            setHasLoadedCommunity(true);
-        }
-        getCommunity();
+            try {
+                // Obtener el token del localStorage
+                const token = localStorage.getItem('token');
 
+                // Verificar si hay un token almacenado
+                if (!token) {
+                    console.log("Token not found in localStorage");
+                    navigate('/login');
+                    return;
+                }
+
+                // Configurar los headers de la solicitud para incluir el token
+                const config = {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                };
+
+                // Enviar la solicitud GET al servidor para obtener la comunidad
+                const response = await Axios.get(`http://localhost:1337/api/getCommunity/${communityId}`, config);
+
+                // Verificar si la respuesta es exitosa
+                if (response.status === 200) {
+                    const community = response.data.data;
+                    setCommunityData(community);
+                    setHasLoadedCommunity(true);
+                } else {
+                    console.log("Error fetching community:", response.statusText);
+                }
+            } catch (error) {
+                console.log("Error:", error.message);
+                navigate('/login');
+            }
+        };
 
         if (!hasLoadedCommunity) {
             getCommunity();
         }
 
-    }, []);
+    }, [communityId, hasLoadedCommunity, navigate]);
 
     function handleChange(event) {
         const { name, value } = event.target;
@@ -50,12 +78,37 @@ const CommunityEditForm = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const response = await Axios.put(`http://localhost:1337/api/updateCommunity/${communityId}`, communityData);
-            console.log(response.data);
-            navigate('/communities/community');
-        }
-        catch (e) {
-            console.log(e);
+            // Obtener el token del localStorage
+            const token = localStorage.getItem('token');
+
+            // Verificar si hay un token almacenado
+            if (!token) {
+                console.log("Token not found in localStorage");
+                navigate('/login');
+                return;
+            }
+
+            // Configurar los headers de la solicitud para incluir el token
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+
+            // Enviar la solicitud PUT al servidor para actualizar la comunidad
+            const response = await Axios.put(`http://localhost:1337/api/updateCommunity/${communityId}`, communityData, config);
+
+            // Verificar si la respuesta es exitosa
+            if (response.status === 200) {
+                console.log("Community updated successfully");
+                navigate('/communities/community');
+            } else {
+                console.log("Error updating community:", response.statusText);
+            }
+        } catch (error) {
+            console.log("Error:", error.message);
+            navigate('/login');
         }
     }
 
@@ -80,4 +133,4 @@ const CommunityEditForm = () => {
     )
 }
 
-export default CommunityEditForm
+export default CommunityEditForm;
