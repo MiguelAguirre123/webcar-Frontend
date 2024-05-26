@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom' // Importa useNavigate desde 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   CContainer,
@@ -34,6 +34,8 @@ const AppHeader = () => {
 
   const dispatch = useDispatch()
   const sidebarShow = useSelector((state) => state.sidebarShow)
+  
+  const navigate = useNavigate(); // Hook para navegación
 
   useEffect(() => {
     document.addEventListener('scroll', () => {
@@ -58,10 +60,16 @@ const AppHeader = () => {
             </CNavLink>
           </CNavItem>
           <CNavItem>
-            <CNavLink href="#">Users</CNavLink>
+            {/* Cambia Users por Login y añade onClick para redireccionar */}
+            <CNavLink onClick={() => navigate('/login')}>
+              Login
+            </CNavLink>
           </CNavItem>
           <CNavItem>
-            <CNavLink href="#">Settings</CNavLink>
+            {/* Cambia Settings por Register y añade onClick para redireccionar */}
+            <CNavLink onClick={() => navigate('/users/userform')}>
+              Register
+            </CNavLink>
           </CNavItem>
         </CHeaderNav>
         <CHeaderNav className="ms-auto">

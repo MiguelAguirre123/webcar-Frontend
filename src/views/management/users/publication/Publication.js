@@ -22,15 +22,30 @@ const Publication = () => {
   const navigate = useNavigate();
 
   useEffect(()=>{
-    const getPublications = async() =>{
-      const response = await Axios({
-        url: 'http://localhost:1337/api/listpublication'
-      });
-      const listPublications = Object.keys(response.data).map(i=> response.data[i]);
-      setPublicationData(listPublications.flat());
-    }
+    const getPublications = async () => {
+      try {
+          // Obtener el token del localStorage o de las cookies
+          const token = localStorage.getItem('token'); // Suponiendo que hayas almacenado el token en el localStorage
 
-    getPublications();
+          // Configurar los headers de la solicitud para incluir el token
+          const config = {
+              headers: {
+                  Authorization: `Bearer ${token}`, // Incluir el token en el encabezado Authorization
+                  'Content-Type': 'application/json'
+              }
+          };
+
+          // Realizar la solicitud GET con la configuración de los headers
+          const response = await Axios.get('http://localhost:1337/api/listpublication', config);
+          const listPublications = Object.keys(response.data).map(i => response.data[i]);
+          setPublicationData(listPublications.flat());
+      } catch (error) {
+          console.log(error);
+          navigate('/login');
+      }
+  };
+
+  getPublications();
   },[]);
 
   function handleCreatePublication(event){
@@ -41,16 +56,45 @@ const Publication = () => {
     navigate(`/users/publicationeditform/${publicationId}`)
   }
 
-  const handleDisablePublication = async(publicationId) => {
-    try{
-      var url = "http://localhost:1337/api/disablepublication/"+publicationId;
-      const response = await Axios.put(url);
-      window.location.reload();
+  const handleDisablePublication = async (publicationId) => {
+    try {
+        // Construir la URL completa para la solicitud PUT
+        const url = 'http://localhost:1337/api/disablepublication/'+publicationId;
+
+        // Obtener el token del localStorage
+        const token = localStorage.getItem('token');
+
+        // Verificar si hay un token almacenado
+        if (!token) {
+            console.log("Token not found in localStorage");
+            return; // Abortar la función si no se encuentra el token
+        }
+
+        // Configurar los headers de la solicitud para incluir el token
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        };
+
+        // Enviar la solicitud PUT al servidor para deshabilitar la publicación
+        const response = await Axios.put(url, {}, config);
+
+        // Verificar si la respuesta es exitosa
+        if (response.status === 200) {
+            console.log("Publication disabled successfully");
+            window.location.reload(); // Recargar la página después de deshabilitar la publicación
+        } else {
+            console.log("Error disabling publication:", response.statusText);
+            // Manejar el error si la solicitud no es exitosa
+        }
+    } catch (error) {
+        console.log("Error:", error.message);
+        navigate('/login');
+        // Manejar cualquier error de la solicitud
     }
-    catch(e){
-      console.log(e)
-    }
-  }
+};
 
   const columns = [
     {

@@ -20,13 +20,16 @@ const PublicationForm = () => {
     const navigate = useNavigate();
 
     useEffect(()=>{
+        /*
         const getUsers = async () => {
             const response = await Axios({url:`http://localhost:1337/api/listuser`});
             const lstUsers = Object.keys(response.data).map(i=> response.data[i]);
             setUsers(lstUsers.flat());
         }
+        
 
         getUsers();
+        */
 
     },[selectedUser]);
 
@@ -52,13 +55,25 @@ const PublicationForm = () => {
 
     const handleSubmit = async(event)=>{
         event.preventDefault();
-        try{
-            const response = await Axios.post('http://localhost:1337/api/createpublication', publicationData);
+        try {
+            // Obtener el token del localStorage o de las cookies
+            const token = localStorage.getItem('token'); // Suponiendo que hayas almacenado el token en el localStorage
+    
+            // Configurar los headers de la solicitud para incluir el token
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`, // Incluir el token en el encabezado Authorization
+                    'Content-Type': 'application/json'
+                }
+            };
+    
+            // Realizar la solicitud POST con los datos de la publicación y la configuración de los headers
+            const response = await Axios.post('http://localhost:1337/api/createpublication', publicationData, config);
             console.log(response.data);
             navigate('/users/publication');
-        }
-        catch (e){
+        } catch (e) {
             console.log(e);
+            navigate('/login');
         }
     }
 
