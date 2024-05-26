@@ -86,7 +86,6 @@ const User = () => {
 
   return (
     <div>
-      <CButton onClick={handleCreateUser}> New User </CButton>
       <CTable>
         <CTableHead>
           <CTableRow>

@@ -15,6 +15,7 @@ const UserForm = () => {
         userName: '',
         userPhone: '',
         userNickName:'',
+        userPassword: '',
         userAddress: '',
         userEmail: ''
     });
@@ -37,7 +38,7 @@ const UserForm = () => {
         try{
             const response = await Axios.post('http://localhost:1337/api/createuser', userData);
             console.log(response.data);
-            navigate('/users/user');
+            navigate('/login');
         }
         catch (e){
             console.log(e);
@@ -73,6 +74,16 @@ const UserForm = () => {
                     name="userNickName" 
                     label="NickName" 
                     value={userData.userNickName} 
+                    onChange={handleChange} 
+                />
+            </CCol>
+            <CCol md={6}>
+                <CFormInput 
+                    type="text" 
+                    id="userPassword" 
+                    name="userPassword" 
+                    label="Password" 
+                    value={userData.userPassword} 
                     onChange={handleChange} 
                 />
             </CCol>

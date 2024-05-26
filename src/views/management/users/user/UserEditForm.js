@@ -17,10 +17,12 @@ const UserEditForm = () => {
         userName: '',
         userPhone: '',
         userNickName:'',
+        userPassword: '',
         userAddress: '',
         userEmail: ''
     });
     const [hasLoadedUser, setHasLoadedUser] = useState(false);
+    const [hashedPassword, setHashedPassword] = useState('');
     const navigate = useNavigate();
 
     useEffect(()=>{
@@ -28,7 +30,11 @@ const UserEditForm = () => {
         const getUser = async() => {
             const response = await Axios({url: `http://localhost:1337/api/getuser/${userId}`})
             const user = response.data.data
-            setUserData(user);
+            setUserData({
+                ...user,
+                userPassword: ''
+            });
+            setHashedPassword(userData.userPassword)
             setHasLoadedUser(true)
         }
 
@@ -36,7 +42,7 @@ const UserEditForm = () => {
             getUser();
         }
         
-    },[ userId, hasLoadedUser]);
+    },[ userId, hasLoadedUser, hashedPassword]);
 
 
     function handleChange(event){
@@ -92,6 +98,16 @@ const UserEditForm = () => {
                     name="userNickName" 
                     label="NickName" 
                     value={userData.userNickName} 
+                    onChange={handleChange} 
+                />
+            </CCol>
+            <CCol md={6}>
+                <CFormInput 
+                    type="text" 
+                    id="userPassword" 
+                    name="userPassword" 
+                    label="Password" 
+                    value={userData.userPassword} 
                     onChange={handleChange} 
                 />
             </CCol>
