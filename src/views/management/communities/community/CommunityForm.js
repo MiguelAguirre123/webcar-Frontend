@@ -1,41 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Axios from 'axios';
 import {
     CForm,
     CCol,
     CFormInput,
-    CFormSelect,
     CButton
-} from '@coreui/react'
+} from '@coreui/react';
 
 const CommunityForm = () => {
-
-    const { communityId } = useParams();
     const [communityData, setCommunityData] = useState({
         communityName: '',
         communityCreator: '',
         communityDescription: '',
     });
 
-    const [hasLoadedCommunity, setHasLoadedCommunity] = useState(false);
     const navigate = useNavigate();
-
-    useEffect(() => {
-
-        const getCommunity = async () => {
-            const response = await Axios({ url: `http://localhost:1332/api/getCommunity/${communityId}` })
-            const community = response.data.data
-            setCommunityData(community);
-            setHasLoadedCommunity(true);
-        }
-        getCommunity();
-
-        if (!hasLoadedCommunity) {
-            getCommunity();
-        }
-
-    }, [/*selectedDepartment, restaurantId, hasLoadedRestaurant*/]);
 
     function handleChange(event) {
         const { name, value } = event.target;
@@ -45,19 +25,44 @@ const CommunityForm = () => {
         });
     }
 
-    function handleReturn(event) {
+    function handleReturn() {
         navigate('/communities/community');
     }
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const response = await Axios.post('http://localhost:1337/api/createCommunity', communityData);
-            console.log(response.data);
-            navigate('/communities/community');
-        }
-        catch (e) {
-            console.log(e);
+            // Obtener el token del localStorage
+            const token = localStorage.getItem('token');
+
+            // Verificar si hay un token almacenado
+            if (!token) {
+                console.log("Token not found in localStorage");
+                navigate('/login');
+                return;
+            }
+
+            // Configurar los headers de la solicitud para incluir el token
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+
+            // Enviar la solicitud POST al servidor para crear la comunidad
+            const response = await Axios.post('http://localhost:1337/api/createCommunity', communityData, config);
+
+            // Verificar si la respuesta es exitosa
+            if (response.status === 200) {
+                console.log("Community created successfully");
+                navigate('/communities/community');
+            } else {
+                console.log("Error creating community:", response.statusText);
+            }
+        } catch (error) {
+            console.log("Error:", error.message);
+            navigate('/login');
         }
     }
 
@@ -82,4 +87,4 @@ const CommunityForm = () => {
     )
 }
 
-export default CommunityForm
+export default CommunityForm;
