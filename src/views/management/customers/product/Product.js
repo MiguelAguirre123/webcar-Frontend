@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';   
+import { useNavigate, useParams } from 'react-router-dom';
 import CIcon from '@coreui/icons-react';
 import Axios from 'axios';
 import {
@@ -14,48 +14,97 @@ import {
 import {
   cilPencil,
   cilTrash
-} from '@coreui/icons'
+} from '@coreui/icons';
 
 const Product = () => {
-
   const [productData, setProductData] = useState([]);
   const navigate = useNavigate();
   const { customerId } = useParams();
 
-  useEffect(()=>{
-    const getProducts = async() =>{
-      const response = await Axios({
-        url: `http://localhost:1337/api/listproduct/${customerId}`
-      });
-      const listProducts = Object.keys(response.data).map(i=> response.data[i]);
-      setProductData(listProducts.flat());
-    }
+  useEffect(() => {
+    const getProducts = async () => {
+      try {
+        // Obtener el token del localStorage
+        const token = localStorage.getItem('token'); 
+
+        // Verificar si hay un token almacenado
+        if (!token) {
+          console.log("Token not found in localStorage");
+          navigate('/login'); 
+          return;
+        }
+
+      
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`, 
+            'Content-Type': 'application/json'
+          }
+        };
+
+        // Realizar la solicitud GET con la configuración de los headers
+        const response = await Axios.get(`http://localhost:1337/api/listproduct/${customerId}`, config);
+        const listProducts = Object.keys(response.data).map(i => response.data[i]);
+        setProductData(listProducts.flat());
+      } catch (error) {
+        console.log(error);
+        navigate('/login');
+      }
+    };
 
     getProducts();
-  },[]);
+  }, [customerId, navigate]);
 
-  function handleCreateProduct(event){
+  function handleCreateProduct() {
     navigate(`/customers/productform/${customerId}`);
   }
 
-  function handleEditProduct(ProductId){
-    navigate(`/customers/producteditform/${ProductId}`)
+  function handleEditProduct(productId) {
+    navigate(`/customers/producteditform/${productId}`);
   }
 
-  function handleReturn(event){
+  function handleReturn() {
     navigate('/customers/productbycustomer/');
   }
 
-  const handleDisableProduct = async(ProductId) => {
-    try{
-      var url = "http://localhost:1337/api/disableProduct/" + ProductId;
-      const response = await Axios.put(url);
-      window.location.reload();
+  const handleDisableProduct = async (productId) => {
+    try {
+      // Construir la URL completa para la solicitud PUT
+      const url = 'http://localhost:1337/api/disableProduct/'+productId;
+
+      // Obtener el token del localStorage
+      const token = localStorage.getItem('token');
+
+      // Verificar si hay un token almacenado
+      if (!token) {
+        console.log("Token not found in localStorage");
+        navigate('/login'); 
+        return;
+      }
+
+      // Configurar los headers de la solicitud para incluir el token
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      };
+
+      // Enviar la solicitud PUT al servidor para deshabilitar el producto
+      const response = await Axios.put(url, {}, config);
+
+      if (response.status === 200) {
+        console.log("Product disabled successfully");
+        window.location.reload(); 
+      } else {
+        console.log("Error disabling product:", response.statusText);
+    
+      }
+    } catch (error) {
+      console.log("Error:", error.message);
+      navigate('/login');
     }
-    catch(e){
-      console.log(e)
-    }
-  }
+  };
 
   const columns = [
     {
@@ -74,12 +123,12 @@ const Product = () => {
       title: 'Options',
       render: (text, record) => (
         <div>
-          <CButton onClick={() => handleEditProduct(record.productId)}><CIcon icon={cilPencil}/></CButton>
-          <CButton onClick={() => handleDisableProduct(record.productId)}><CIcon icon={cilTrash}/></CButton>
+          <CButton onClick={() => handleEditProduct(record.productId)}><CIcon icon={cilPencil} /></CButton>
+          <CButton onClick={() => handleDisableProduct(record.productId)}><CIcon icon={cilTrash} /></CButton>
         </div>
       )
     }
-  ]
+  ];
 
   return (
     <div>
@@ -106,7 +155,7 @@ const Product = () => {
         </CTableBody>
       </CTable>
     </div>
-  )
+  );
 }
 
 export default Product;

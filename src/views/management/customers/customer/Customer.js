@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';   
+import { useNavigate } from 'react-router-dom';
 import CIcon from '@coreui/icons-react';
 import Axios from 'axios';
 import {
@@ -14,43 +14,86 @@ import {
 import {
   cilPencil,
   cilTrash
-} from '@coreui/icons'
+} from '@coreui/icons';
 
 const Customer = () => {
-
-  const [customerData, setcustomerData] = useState([]);
+  const [customerData, setCustomerData] = useState([]);
   const navigate = useNavigate();
 
-  useEffect(()=>{
-    const getcustomer = async() =>{
-      const response = await Axios({
-        url: 'http://localhost:1337/api/listCustomer'
-      });
-      const listCustomers = Object.keys(response.data).map(i=> response.data[i]);
-      setcustomerData(listCustomers.flat());
-    }
+  useEffect(() => {
+    const getCustomers = async () => {
+      try {
+        // Obtener el token del localStorage o de las cookies
+        const token = localStorage.getItem('token'); 
 
-    getcustomer();
-  },[]);
+        // Configurar los headers de la solicitud para incluir el token
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`, 
+            'Content-Type': 'application/json'
+          }
+        };
 
-  function handleCreateCustomers(event){
+        // Realizar la solicitud GET con la configuración de los headers
+        const response = await Axios.get('http://localhost:1337/api/listCustomer', config);
+        const listCustomers = Object.keys(response.data).map(i => response.data[i]);
+        setCustomerData(listCustomers.flat());
+      } catch (error) {
+        console.log(error);
+        navigate('/login');
+      }
+    };
+
+    getCustomers();
+  }, [navigate]);
+
+  function handleCreateCustomers(event) {
     navigate('/customers/customerForm');
   }
 
-  function handleEditCustomer(customerId){
-    navigate(`/customers/CustomerEditForm/${customerId}`)
+  function handleEditCustomer(customerId) {
+    navigate(`/customers/CustomerEditForm/${customerId}`);
   }
 
-  const handleDisableCustomer = async(customerId) => {
-    try{
-      var url = "http://localhost:1337/api/disableCustomer/"+customerId;
-      const response = await Axios.put(url);
-      window.location.reload();
+  const handleDisableCustomer = async (customerId) => {
+    try {
+      // Construir la URL completa para la solicitud PUT
+      const url = 'http://localhost:1337/api/disableCustomer/'+customerId;
+
+      // Obtener el token del localStorage
+      const token = localStorage.getItem('token');
+
+      // Verificar si hay un token almacenado
+      if (!token) {
+        console.log("Token not found in localStorage");
+        return; // Abortar la función si no se encuentra el token
+      }
+
+      // Configurar los headers de la solicitud para incluir el token
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      };
+
+      // Enviar la solicitud PUT al servidor para deshabilitar el cliente
+      const response = await Axios.put(url, {}, config);
+
+      // Verificar si la respuesta es exitosa
+      if (response.status === 200) {
+        console.log("Customer disabled successfully");
+        window.location.reload(); // Recargar la página después de deshabilitar el cliente
+      } else {
+        console.log("Error disabling customer:", response.statusText);
+     
+      }
+    } catch (error) {
+      console.log("Error:", error.message);
+      navigate('/login');
+
     }
-    catch(e){
-      console.log(e)
-    }
-  }
+  };
 
   const columns = [
     {
@@ -74,16 +117,15 @@ const Customer = () => {
       dataIndex: 'customerEmail'
     },
     {
-
       title: 'Options',
       render: (text, record) => (
         <div>
-          <CButton onClick={() => handleEditCustomer(record.customerId)}><CIcon icon={cilPencil}/></CButton>
-          <CButton onClick={() => handleDisableCustomer(record.customerId)}><CIcon icon={cilTrash}/></CButton>
+          <CButton onClick={() => handleEditCustomer(record.customerId)}><CIcon icon={cilPencil} /></CButton>
+          <CButton onClick={() => handleDisableCustomer(record.customerId)}><CIcon icon={cilTrash} /></CButton>
         </div>
       )
     }
-  ]
+  ];
 
   return (
     <div>
@@ -109,7 +151,7 @@ const Customer = () => {
         </CTableBody>
       </CTable>
     </div>
-  )
+  );
 }
 
-export default Customer
+export default Customer;

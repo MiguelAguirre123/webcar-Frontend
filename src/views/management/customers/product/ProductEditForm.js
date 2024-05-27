@@ -15,7 +15,7 @@ const ProductEditForm = () => {
         productName: '',
         productDescription: '',
         productPrice: '',
-        customerId:''
+        customerId: ''
     });
 
     const [hasLoadedProduct, setHasLoadedProduct] = useState(false);
@@ -23,16 +23,48 @@ const ProductEditForm = () => {
 
     useEffect(() => {
         const getProduct = async () => {
-            const response = await Axios.get(`http://localhost:1337/api/getProduct/${productId}`);
-            const product = response.data.data;
-            setProductData(product);
-            setHasLoadedProduct(true);
+            try {
+                // Obtener el token del localStorage
+                const token = localStorage.getItem('token');
+
+                // Verificar si hay un token almacenado
+                if (!token) {
+                    console.log("Token not found in localStorage");
+                    navigate('/login'); 
+                    return;
+                }
+
+                // Configurar los headers de la solicitud para incluir el token
+                const config = {
+                    headers: {
+                        Authorization: `Bearer ${token}`, 
+                        'Content-Type': 'application/json'
+                    }
+                };
+
+                // Enviar la solicitud GET al servidor para obtener el producto
+                const response = await Axios.get(`http://localhost:1337/api/getProduct/${productId}`, config);
+                
+           
+                if (response.status === 200) {
+                    const product = response.data.data;
+                    setProductData(product);
+                    setHasLoadedProduct(true);
+                } else {
+                    console.log("Error fetching product:", response.statusText);
+                 
+                }
+            } catch (error) {
+                console.log("Error:", error.message);
+                navigate('/login');
+          
+            }
         };
-        
+
         if (!hasLoadedProduct) {
             getProduct();
         }
-    }, [productId, hasLoadedProduct]);
+    }, [productId, hasLoadedProduct, navigate]);
 
     function handleChange(event) {
         const { name, value } = event.target;
@@ -49,14 +81,25 @@ const ProductEditForm = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const response = await Axios.put(`http://localhost:1337/api/updateproduct/${productId}`, productData);
+            // Obtener el token del localStorage o de las cookies
+            const token = localStorage.getItem('token');
+
+            // Configurar los headers de la solicitud para incluir el token
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`, 
+                    'Content-Type': 'application/json'
+                }
+            };
+
+            const response = await Axios.put(`http://localhost:1337/api/updateproduct/${productId}`, productData, config);
             console.log(response.data);
             navigate(`/customers/product/${productData.customerId}`);
-        }
-        catch (e) {
+        } catch (e) {
             console.log(e);
+            navigate('/login');
         }
-    }
+    };
 
     return (
         <CForm className="row g-3" onSubmit={handleSubmit}>

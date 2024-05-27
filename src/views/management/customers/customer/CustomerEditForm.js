@@ -6,7 +6,7 @@ import {
     CCol,
     CFormInput,
     CButton
-} from '@coreui/react'
+} from '@coreui/react';
 
 const CustomerEditForm = () => {
     const { customerId } = useParams();
@@ -22,17 +22,46 @@ const CustomerEditForm = () => {
 
     useEffect(() => {
         const getCustomer = async () => {
-            const response = await Axios.get(`http://localhost:1337/api/getcustomer/${customerId}`);
-            const customer = response.data.data;
-            setCustomerData(customer);
-            setHasLoadedCustomer(true);
+            try {
+                // Obtener el token del localStorage
+                const token = localStorage.getItem('token');
+
+                // Verificar si hay un token almacenado
+                if (!token) {
+                    console.log("Token not found in localStorage");
+                    navigate('/login'); 
+                    return;
+                }
+
+                // Configurar los headers de la solicitud para incluir el token
+                const config = {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                };
+
+                // Enviar la solicitud GET al servidor para obtener el cliente
+                const response = await Axios.get(`http://localhost:1337/api/getcustomer/${customerId}`, config);
+
+              
+                if (response.status === 200) {
+                    const customer = response.data.data;
+                    setCustomerData(customer);
+                    setHasLoadedCustomer(true);
+                } else {
+                    console.log("Error fetching customer:", response.statusText);
+                }
+            } catch (error) {
+                console.log("Error:", error.message);
+                navigate('/login');
+            }
         };
 
         if (!hasLoadedCustomer) {
             getCustomer();
         }
-    }, [customerId, hasLoadedCustomer]);
-
+    }, [customerId, hasLoadedCustomer, navigate]);
 
     function handleChange(event) {
         const { name, value } = event.target;
@@ -49,14 +78,39 @@ const CustomerEditForm = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const response = await Axios.put(`http://localhost:1337/api/updateCustomer/${customerId}`, customerData);
-            console.log(response.data);
-            navigate('/customers/customer');
+            // Obtener el token del localStorage
+            const token = localStorage.getItem('token');
+
+            // Verificar si hay un token almacenado
+            if (!token) {
+                console.log("Token not found in localStorage");
+                navigate('/login'); 
+                return;
+            }
+
+            // Configurar los headers de la solicitud para incluir el token
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+
+            // Enviar la solicitud PUT al servidor para actualizar el cliente
+            const response = await Axios.put(`http://localhost:1337/api/updateCustomer/${customerId}`, customerData, config);
+
+            // Verificar si la respuesta es exitosa
+            if (response.status === 200) {
+                console.log(response.data);
+                navigate('/customers/customer');
+            } else {
+                console.log("Error updating customer:", response.statusText);
+            }
         } catch (error) {
-            console.log(error);
+            console.log("Error:", error.message);
+            navigate('/login');
         }
-    }
-    
+    };
 
     return (
         <CForm className="row g-3" onSubmit={handleSubmit}>
@@ -83,7 +137,7 @@ const CustomerEditForm = () => {
                 <CButton color="secondary" onClick={handleReturn}>Cancel</CButton>
             </CCol>
         </CForm>
-    )
+    );
 }
 
 export default CustomerEditForm;
