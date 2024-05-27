@@ -1,16 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Axios from 'axios';
 import {
     CForm,
     CCol,
     CFormInput,
-    CFormSelect,
     CButton
-} from '@coreui/react'
+} from '@coreui/react';
 
 const CarForm = () => {
-
     const [carData, setCarData] = useState({
         carName: '',
         carModel: '',
@@ -19,29 +17,39 @@ const CarForm = () => {
     });
     const navigate = useNavigate();
 
-    function handleChange(event){
-        const {name, value} = event.target;
+    const handleChange = (event) => {
+        const { name, value } = event.target;
         setCarData({
             ...carData,
             [name]: value
         });
-    }
+    };
 
-    function handleReturn(event){
+    const handleReturn = () => {
         navigate('/users/car');
-    }
+    };
 
-    const handleSubmit = async(event)=>{
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        try{
-            const response = await Axios.post('http://localhost:1337/api/createcar', carData);
+        try {
+            const token = localStorage.getItem('token'); // Obtener el token del localStorage
+
+            // Configurar los headers de la solicitud para incluir el token
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`, // Incluir el token en el encabezado Authorization
+                    'Content-Type': 'application/json'
+                }
+            };
+            const response = await Axios.post('http://localhost:1337/api/createcar', carData, config); 
             console.log(response.data);
             navigate('/users/car');
+
+        } catch (error) {
+            console.log(error);
+            navigate('/login');
         }
-        catch (e){
-            console.log(e);
-        }
-    }
+    };
 
     return (
         <CForm className="row g-3" onSubmit={handleSubmit}>
@@ -87,13 +95,14 @@ const CarForm = () => {
             </CCol>
             <CCol md={6}></CCol>
             <CCol md={1}>
-                <CButton color="primary" type="submit"> Save </CButton>
+                <CButton color="primary" type="submit">Save</CButton>
             </CCol>
             <CCol md={1}>
                 <CButton color="secondary" onClick={handleReturn}>Cancel</CButton>
             </CCol>
         </CForm>
     );
-}
+};
 
-export default CarForm
+export default CarForm;
+

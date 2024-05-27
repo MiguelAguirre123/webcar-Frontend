@@ -23,10 +23,33 @@ const CarEditForm = () => {
     useEffect(() => {
         const getCar = async () => {
             try {
-                const response = await Axios.get(`http://localhost:1337/api/getcar/${carId}`);
+                // Obtener el token del localStorage
+                const token = localStorage.getItem('token');
+
+                // Verificar si hay un token almacenado
+                if (!token) {
+                    console.log("Token not found in localStorage");
+                    navigate('/login');
+                    return;
+                }
+
+                // Configurar los headers de la solicitud para incluir el token
+                const config = {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                };
+                
+                const response = await Axios.get(`http://localhost:1337/api/getcar/${carId}`, config);
+                if (response.status === 200){
                 const car = response.data.data;
                 setCarData(car);
                 setHasLoadedCar(true);
+                }else {
+                    console.log("Error fetching community:", response.statusText);
+                }
+
             } catch (error) {
                 console.log(error);
             }
@@ -52,11 +75,35 @@ const CarEditForm = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const response = await Axios.put(`http://localhost:1337/api/updatecar/${carId}`, carData);
-            console.log(response.data);
-            navigate('/users/car');
+            // Obtener el token del localStorage
+            const token = localStorage.getItem('token');
+
+            // Verificar si hay un token almacenado
+            if (!token) {
+                console.log("Token not found in localStorage");
+                navigate('/login');
+                return;
+            }
+
+            // Configurar los headers de la solicitud para incluir el token
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+
+            const response = await Axios.put(`http://localhost:1337/api/updatecar/${carId}`, carData, config);
+            
+            if (response.status === 200) {
+                console.log("Car updated successfully");
+                navigate('/users/car');
+            }else {
+                console.log("Error updating car:", response.statusText);
+            }
         } catch (error) {
-            console.log(error);
+            console.log("Error:", error.message);
+            navigate('/login');
         }
     };
 
