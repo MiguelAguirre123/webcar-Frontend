@@ -40,13 +40,13 @@ const CarEditForm = () => {
                         'Content-Type': 'application/json'
                     }
                 };
-                
+
                 const response = await Axios.get(`http://localhost:1337/api/getcar/${carId}`, config);
-                if (response.status === 200){
-                const car = response.data.data;
-                setCarData(car);
-                setHasLoadedCar(true);
-                }else {
+                if (response.status === 200) {
+                    const car = response.data.data;
+                    setCarData(car);
+                    setHasLoadedCar(true);
+                } else {
                     console.log("Error fetching community:", response.statusText);
                 }
 
@@ -94,11 +94,11 @@ const CarEditForm = () => {
             };
 
             const response = await Axios.put(`http://localhost:1337/api/updatecar/${carId}`, carData, config);
-            
+
             if (response.status === 200) {
                 console.log("Car updated successfully");
                 navigate('/users/car');
-            }else {
+            } else {
                 console.log("Error updating car:", response.statusText);
             }
         } catch (error) {

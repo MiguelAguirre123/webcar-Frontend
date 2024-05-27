@@ -12,7 +12,7 @@ const CarForm = () => {
     const [carData, setCarData] = useState({
         carName: '',
         carModel: '',
-        carBrand:'',
+        carBrand: '',
         userId: ''
     });
     const navigate = useNavigate();
@@ -41,7 +41,7 @@ const CarForm = () => {
                     'Content-Type': 'application/json'
                 }
             };
-            const response = await Axios.post('http://localhost:1337/api/createcar', carData, config); 
+            const response = await Axios.post('http://localhost:1337/api/createcar', carData, config);
             console.log(response.data);
             navigate('/users/car');
 
@@ -54,43 +54,43 @@ const CarForm = () => {
     return (
         <CForm className="row g-3" onSubmit={handleSubmit}>
             <CCol md={6}>
-                <CFormInput 
-                    type="text" 
-                    id="carName" 
-                    name="carName" 
-                    label="Name" 
-                    value={carData.carName} 
-                    onChange={handleChange} 
+                <CFormInput
+                    type="text"
+                    id="carName"
+                    name="carName"
+                    label="Name"
+                    value={carData.carName}
+                    onChange={handleChange}
                 />
             </CCol>
             <CCol md={6}>
-                <CFormInput 
-                    type="text" 
-                    id="carModel" 
-                    name="carModel" 
-                    label="Model" 
-                    value={carData.carModel} 
-                    onChange={handleChange} 
+                <CFormInput
+                    type="text"
+                    id="carModel"
+                    name="carModel"
+                    label="Model"
+                    value={carData.carModel}
+                    onChange={handleChange}
                 />
             </CCol>
             <CCol md={6}>
-                <CFormInput 
-                    type="text" 
-                    id="carBrand" 
-                    name="carBrand" 
-                    label="Brand" 
-                    value={carData.carBrand} 
-                    onChange={handleChange} 
+                <CFormInput
+                    type="text"
+                    id="carBrand"
+                    name="carBrand"
+                    label="Brand"
+                    value={carData.carBrand}
+                    onChange={handleChange}
                 />
             </CCol>
             <CCol md={6}>
-                <CFormInput 
-                    type="text" 
-                    id="userId" 
-                    name="userId" 
-                    label="User" 
-                    value={carData.userId} 
-                    onChange={handleChange} 
+                <CFormInput
+                    type="text"
+                    id="userId"
+                    name="userId"
+                    label="User"
+                    value={carData.userId}
+                    onChange={handleChange}
                 />
             </CCol>
             <CCol md={6}></CCol>
