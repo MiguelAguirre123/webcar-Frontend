@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';   
+import { useNavigate } from 'react-router-dom';
 import CIcon from '@coreui/icons-react';
 import Axios from 'axios';
 import {
@@ -20,78 +20,78 @@ const Car = () => {
   const [carData, setCarData] = useState([]);
   const navigate = useNavigate();
 
-  useEffect(()=>{
+  useEffect(() => {
     const getCars = async () => {
       try {
-          // Obtener el token del localStorage o de las cookies
-          const token = localStorage.getItem('token'); // Suponiendo que hayas almacenado el token en el localStorage
+        // Obtener el token del localStorage o de las cookies
+        const token = localStorage.getItem('token'); // Suponiendo que hayas almacenado el token en el localStorage
 
-          // Configurar los headers de la solicitud para incluir el token
-          const config = {
-              headers: {
-                  Authorization: `Bearer ${token}`, // Incluir el token en el encabezado Authorization
-                  'Content-Type': 'application/json'
-              }
-          };
+        // Configurar los headers de la solicitud para incluir el token
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`, // Incluir el token en el encabezado Authorization
+            'Content-Type': 'application/json'
+          }
+        };
 
-          // Realizar la solicitud GET con la configuración de los headers
-          const response = await Axios.get('http://localhost:1337/api/listcar', config);
-          const listCars = Object.keys(response.data).map(i => response.data[i]);
-          setCarData(listCars.flat());
+        // Realizar la solicitud GET con la configuración de los headers
+        const response = await Axios.get('http://localhost:1337/api/listcar', config);
+        const listCars = Object.keys(response.data).map(i => response.data[i]);
+        setCarData(listCars.flat());
       } catch (error) {
-          console.log(error);
-          navigate('/login');
+        console.log(error);
+        navigate('/login');
       }
     };
 
     getCars();
   }, [navigate]);
 
-  function handleCreateCar(event){
+  function handleCreateCar(event) {
     navigate('/users/carform');
   }
 
-  function handleEditCar(carId){
+  function handleEditCar(carId) {
     navigate(`/users/careditform/${carId}`)
   }
 
   const handleDisableCar = async (carId) => {
     try {
-        // Construir la URL completa para la solicitud PUT
-        const url = `http://localhost:1337/api/disablecar/${carId}`;
+      // Construir la URL completa para la solicitud PUT
+      const url = `http://localhost:1337/api/disablecar/${carId}`;
 
-        // Obtener el token del localStorage
-        const token = localStorage.getItem('token');
+      // Obtener el token del localStorage
+      const token = localStorage.getItem('token');
 
-        // Verificar si hay un token almacenado
-        if (!token) {
-            console.log("Token not found in localStorage");
-            return; // Abortar la función si no se encuentra el token
+      // Verificar si hay un token almacenado
+      if (!token) {
+        console.log("Token not found in localStorage");
+        return; // Abortar la función si no se encuentra el token
+      }
+
+      // Configurar los headers de la solicitud para incluir el token
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
+      };
 
-        // Configurar los headers de la solicitud para incluir el token
-        const config = {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        };
+      // Enviar la solicitud PUT al servidor para deshabilitar el carro
+      const response = await Axios.put(url, {}, config);
 
-        // Enviar la solicitud PUT al servidor para deshabilitar el carro
-        const response = await Axios.put(url, {}, config);
-
-        // Verificar si la respuesta es exitosa
-        if (response.status === 200) {
-            console.log("Car disabled successfully");
-            window.location.reload(); // Recargar la página después de deshabilitar el carro
-        } else {
-            console.log("Error disabling car:", response.statusText);
-            // Manejar el error si la solicitud no es exitosa
-        }
+      // Verificar si la respuesta es exitosa
+      if (response.status === 200) {
+        console.log("Car disabled successfully");
+        window.location.reload(); // Recargar la página después de deshabilitar el carro
+      } else {
+        console.log("Error disabling car:", response.statusText);
+        // Manejar el error si la solicitud no es exitosa
+      }
     } catch (error) {
-        console.log("Error:", error.message);
-        navigate('/login');
-        // Manejar cualquier error de la solicitud
+      console.log("Error:", error.message);
+      navigate('/login');
+      // Manejar cualquier error de la solicitud
     }
   };
 
@@ -111,13 +111,13 @@ const Car = () => {
     {
       title: 'User',
       dataIndex: 'userId'
-    }, 
+    },
     {
       title: 'Options',
       render: (text, record) => (
         <div>
-          <CButton onClick={() => handleEditCar(record.carId)}><CIcon icon={cilPencil}/></CButton>
-          <CButton onClick={() => handleDisableCar(record.carId)}><CIcon icon={cilTrash}/></CButton>
+          <CButton onClick={() => handleEditCar(record.carId)}><CIcon icon={cilPencil} /></CButton>
+          <CButton onClick={() => handleDisableCar(record.carId)}><CIcon icon={cilTrash} /></CButton>
         </div>
       )
     }
