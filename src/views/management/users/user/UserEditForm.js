@@ -28,15 +28,43 @@ const UserEditForm = () => {
     useEffect(()=>{
         
         const getUser = async() => {
-            const response = await Axios({url: `http://localhost:1337/api/getuser/${userId}`})
-            const user = response.data.data
-            setUserData({
-                ...user,
-                userPassword: ''
-            });
-            setHashedPassword(userData.userPassword)
-            setHasLoadedUser(true)
+            try{
+                // Obtener el token del localStorage
+                const token = localStorage.getItem('token');
+
+                // Verificar si hay un token almacenado
+                if (!token) {
+                    console.log("Token not found in localStorage");
+                    navigate('/login');
+                    return;
+                }
+
+                // Configurar los headers de la solicitud para incluir el token
+                const config = {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                };
+            const response = await Axios.get( `http://localhost:1337/api/getuser/${userId}`, config)
+
+            if(response.status === 200){
+                const user = response.data.data;
+                setUserData({
+                    ...user,
+                    userPassword: ''
+                });
+                setHashedPassword(userData.userPassword)
+                setHasLoadedUser(true)
+            }else{
+                console.log("Error fetching user:", response.statusText);
+            }
+            
+        }catch(error){
+            console.log("Error:", error.message);
+                navigate('/login');
         }
+    }
 
         if(!hasLoadedUser){
             getUser();
@@ -60,12 +88,37 @@ const UserEditForm = () => {
     const handleSubmit = async(event)=>{
         event.preventDefault();
         try{
-            const response = await Axios.put(`http://localhost:1337/api/updateuser/${userId}`, userData);
-            console.log(response.data);
-            navigate('/users/user');
+            // Obtener el token del localStorage
+            const token = localStorage.getItem('token');
+
+            // Verificar si hay un token almacenado
+            if (!token) {
+                console.log("Token not found in localStorage");
+                navigate('/login');
+                return;
+            }
+
+            // Configurar los headers de la solicitud para incluir el token
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+            const response = await Axios.put(`http://localhost:1337/api/updateuser/${userId}`, userData,config);
+
+            // Verificar si la respuesta es exitosa
+            if (response.status === 200) {
+                console.log("car updated successfully");
+                navigate('/users/user');
+            } else {
+                console.log("Error updating community:", response.statusText);
+            }
+            
         }
         catch (e){
-            console.log(e);
+            console.log("Error:", error.message);
+            navigate('/login');
         }
     }
 
