@@ -9,126 +9,122 @@ import {
     CButton
 } from '@coreui/react'
 
-const RestaurantEditForm = () => {
+const PublicationEditForm = () => {
 
-    const {restaurantId} = useParams();
-    const [restaurantData, setRestaurantData] = useState({
-        restaurantName: '',
-        restaurantNit: '',
-        restaurantAddress:'',
-        restaurantPhone: '',
-        cityId: '',
-        city: []
+    const {publicationId} = useParams();
+    const [publicationData, setPublicationData] = useState({
+        publicationContent: '',
+        userId: 0
     });
-    const [departments, setDepartments] = useState([]);
-    const [selectedDepartment, setSelectedDepartment] = useState('');
-    const [cities, setCities] = useState([]);
-    const [selectedCity, setSelectedCity] = useState('');
-    const [hasLoadedRestaurant, setHasLoadedRestaurant] = useState(false);
+    const [users, setUsers] = useState([]);
+    const [selectedUser, setSelectedUser] = useState('');
+    const [hasLoadedPublication, setHasLoadedPublication] = useState(false);
     const navigate = useNavigate();
 
     useEffect(()=>{
+
+        const getPublication = async () => {
+            try {
+                // Obtener el token del localStorage
+                const token = localStorage.getItem('token');
+                
+                // Verificar si hay un token almacenado
+                if (!token) {
+                    console.log("Token not found in localStorage");
+                    return; // Abortar la función si no se encuentra el token
+                }
         
-        const getRestaurant = async() => {
-            const response = await Axios({url: `http://localhost:1337/api/getrestaurant/${restaurantId}`})
-            const restaurant = response.data.data
-            setRestaurantData(restaurant);
-            const departmentId = restaurant.city.departmentId;
-            const cityId = restaurant.cityId;
-            setSelectedDepartment(departmentId);
-            setSelectedCity(cityId);
-            setHasLoadedRestaurant(true);
+                // Configurar los headers de la solicitud para incluir el token
+                const config = {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                };
+        
+                // Enviar la solicitud GET al servidor para obtener la publicación
+                const response = await Axios.get(`http://localhost:1337/api/getpublication/${publicationId}`, config);
+                
+                // Verificar si la respuesta es exitosa
+                if (response.status === 200) {
+                    const publication = response.data.data;
+                    setPublicationData(publication);
+                    setSelectedUser(publication.userId);
+                    setHasLoadedPublication(true);
+                } else {
+                    console.log("Error fetching publication:", response.statusText);
+                    // Manejar el error si la solicitud no es exitosa
+                }
+            } catch (error) {
+                console.log("Error:", error.message);
+                navigate('/login');
+                // Manejar cualquier error de la solicitud
+            }
+        };
+        
+
+        /*
+        const getUsers = async () => {
+            const response = await Axios({url:`http://localhost:1337/api/listuser`});
+            const lstUsers = Object.keys(response.data).map(i=> response.data[i]);
+            setUsers(lstUsers.flat());
         }
 
-        const getDepartments = async () => {
-            const response = await Axios({url:`http://localhost:1337/api/listdepartment`});
-            const lstDepartments = Object.keys(response.data).map(i=> response.data[i]);
-            setDepartments(lstDepartments.flat());
-        }
+        getUsers();
+        */
 
-        const getCities = async(departmentId)=>{
-            const response = await Axios({url:`http://localhost:1337/api/listcity/${departmentId}`});
-            const lstCities = Object.keys(response.data).map(i=> response.data[i]);
-            setCities(lstCities.flat());
-        }
+        if(!hasLoadedPublication)
+            getPublication();
 
-        getDepartments();
+    },[selectedUser, publicationId, hasLoadedPublication]);
 
-        if(!hasLoadedRestaurant){
-            getRestaurant();
-        }
-
-        if(selectedDepartment !== ""){
-            getCities(selectedDepartment);
-        }
-
-    },[selectedDepartment, restaurantId, hasLoadedRestaurant]);
-
-    function handleSelectDepartments(event){
-        setSelectedDepartment(event.target.value);
-    }
-
-    function handleSelectCities(event){
-        setSelectedCity(event.target.value);
-        setRestaurantData({
-            ...restaurantData,
-            cityId: event.target.value
+    function handleSelectUsers(event){
+        setSelectedUser(event.target.value);
+        setPublicationData({
+            ...publicationData,
+            userId: parseInt(event.target.value)
         })
     }
 
     function handleChange(event){
         const {name, value} = event.target;
-        setRestaurantData({
-            ...restaurantData,
+        setPublicationData({
+            ...publicationData,
             [name]: value
         });
     }
 
     function handleReturn(event){
-        navigate('/restaurants/restaurant');
+        navigate('/users/publication');
     }
 
     const handleSubmit = async(event)=>{
         event.preventDefault();
         try{
-            const response = await Axios.put(`http://localhost:1337/api/updaterestaurant/${restaurantId}`, restaurantData);
+                      // Obtener el token del localStorage o de las cookies
+          const token = localStorage.getItem('token'); // Suponiendo que hayas almacenado el token en el localStorage
+
+          // Configurar los headers de la solicitud para incluir el token
+          const config = {
+              headers: {
+                  Authorization: `Bearer ${token}`, // Incluir el token en el encabezado Authorization
+                  'Content-Type': 'application/json'
+              }
+          };
+            const response = await Axios.put(`http://localhost:1337/api/updatepublication/${publicationId}`, publicationData, config);
             console.log(response.data);
-            navigate('/restaurants/restaurant');
+            navigate('/users/publication');
         }
         catch (e){
             console.log(e);
+            navigate('/login');
         }
     }
 
     return(
         <CForm className="row g-3" onSubmit={handleSubmit}>
             <CCol md={12}>
-                <CFormInput type="text" id="restaurantName" name="restaurantName" label="Name" value={restaurantData.restaurantName} onChange={handleChange} />
-            </CCol>
-            <CCol md={12}>
-                <CFormInput type="text" id="restaurantNit" name="restaurantNit" label="Nit" value={restaurantData.restaurantNit} onChange={handleChange} />
-            </CCol>
-            <CCol xs={4}>
-                <CFormSelect id="departmentOptions" label = "Department" value={ selectedDepartment} onChange={handleSelectDepartments} >
-                    <option value="">Select a department</option>
-                    {departments.map(opcion =>(
-                        <option key={opcion.value} value={opcion.value}>{opcion.label}</option>
-                    ))}
-                </CFormSelect>
-            </CCol>
-            <CCol xs={4}>
-                <CFormSelect id="cityOptions" label = "City" value={ selectedCity} onChange={handleSelectCities} >
-                    <option value="">Select a city</option>
-                    {cities.map(opcion =>(
-                        <option key={opcion.value} value={opcion.value}>{opcion.label}</option>
-                    ))}
-                </CFormSelect>
-            </CCol>
-            <CCol xs={4}>
-                <CFormInput type="text" id="restaurantAddress" name="restaurantAddress" label="Address" value={restaurantData.restaurantAddress} onChange={handleChange} />
-            </CCol>
-            <CCol md={12}>
-                <CFormInput type="text" id="restaurantPhone" name="restaurantPhone" label="Phone" value={restaurantData.restaurantPhone} onChange={handleChange} />
+                <CFormInput type="text" id="publicationContent" name="publicationContent" label="Description" value={publicationData.publicationContent} onChange={handleChange} />
             </CCol>
             <CCol xs={6}>
                 <CButton color="primary" type="submit" >Save</CButton>
@@ -140,4 +136,4 @@ const RestaurantEditForm = () => {
     )
 }
 
-export default RestaurantEditForm
+export default PublicationEditForm

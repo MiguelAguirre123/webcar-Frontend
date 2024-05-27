@@ -14,71 +14,119 @@ import {
 import {
   cilPencil,
   cilTrash
-} from '@coreui/icons'
+} from '@coreui/icons'
 
-const Restaurant = () => {
+const User = () => {
 
-  const [restaurantData, setRestaurantData] = useState([]);
+  const [userData, setUserData] = useState([]);
   const navigate = useNavigate();
 
   useEffect(()=>{
-    const getRestaurants = async() =>{
-      const response = await Axios({
-        url: 'http://localhost:1337/api/listrestaurant'
-      });
-      const listRestaurants = Object.keys(response.data).map(i=> response.data[i]);
-      setRestaurantData(listRestaurants.flat());
-    }
+    const getUsers = async() =>{
+      try {
+          // Obtener el token del localStorage
+          const token = localStorage.getItem('token');
 
-    getRestaurants();
+          // Verificar si hay un token almacenado
+          if (!token) {
+            console.log("Token not found in localStorage");
+            navigate('/login');
+            return;
+          }
+
+          // Configurar los headers de la solicitud para incluir el token
+          const config = {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          };
+
+          const response = await Axios.get('http://localhost:1337/api/listusers', config);
+          const listUsers = Object.keys(response.data).map(i=> response.data[i]);
+          setUserData(listUsers.flat());
+          console.log("User Data: ", listUsers.flat());
+        } catch (error){
+          console.error("Error fetching users:", error);
+          navigate('/login');
+        }
+    };
+
+    getUsers();
   },[]);
 
-  function handleCreateRestaurant(event){
-    navigate('/restaurants/restaurantform');
+
+
+  function handleCreateUser(event){
+    navigate('/users/userform');
   }
 
-  function handleEditRestaurant(restaurantId){
-    navigate(`/restaurants/restauranteditform/${restaurantId}`)
+  function handleEditUser(userId){
+    navigate(`/users/usereditform/${userId}`)
   }
 
-  const handleDisableRestaurant = async(restaurantId) => {
+  const handleDisableUser = async(userId) => {
     try{
-      var url = "http://localhost:1337/api/disablerestaurant/"+restaurantId;
-      const response = await Axios.put(url);
-      window.location.reload();
+      // Obtener el token del localStorage
+      const token = localStorage.getItem('token');
+
+      // Verificar si hay un token almacenado
+      if (!token) {
+        console.log("Token not found in localStorage");
+        navigate('/login');
+        return;
+      }
+
+      // Configurar los headers de la solicitud para incluir el token
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      };
+
+      const url = 'http://localhost:1337/api/disableuser/' + userId;
+      const response = await Axios.put(url,{},config);
+      // Verificar si la respuesta es exitosa
+      if (response.status === 200) {
+        console.log("User disabled successfully");
+        window.location.reload();
+      } else {
+        console.log("Error disabling User:", response.statusText);
+      }
+    } catch (error) {
+      console.log("Error:", error.message);
+      navigate('/login');
     }
-    catch(e){
-      console.log(e)
-    }
-  }
+  };
 
   const columns = [
     {
       title: 'Name',
-      dataIndex: 'restaurantName'
-    },
-    {
-      title: 'NIT',
-      dataIndex: 'restaurantNit'
-    },
-    {
-      title: 'Address',
-      dataIndex: 'restaurantAddress'
+      dataIndex: 'userName'
     },
     {
       title: 'Phone',
-      dataIndex: 'restaurantPhone'
+      dataIndex: 'userPhone'
     },
     {
-      title: 'City',
-      dataIndex: 'cityId'
+      title: 'User',
+      dataIndex: 'userNickName'
+    },
+    {
+      title: 'Address',
+      dataIndex: 'userAddress'
+    },
+    {
+      title: 'Email',
+      dataIndex: 'userEmail'
     },
     {
       title: 'Options',
       render: (text, record) => (
         <div>
-          <CButton onClick={() => handleEditRestaurant(record.restaurantId)}><CIcon icon={cilPencil}/></CButton>
-          <CButton onClick={() => handleDisableRestaurant(record.restaurantId)}><CIcon icon={cilTrash}/></CButton>
+          <CButton onClick={() => handleEditUser(record.userId)}><CIcon icon={cilPencil}/></CButton>
+          <CButton onClick={() => handleDisableUser(record.userId)}><CIcon icon={cilTrash}/></CButton>
         </div>
       )
     }
@@ -86,7 +134,6 @@ const Restaurant = () => {
 
   return (
     <div>
-      <CButton onClick={handleCreateRestaurant}>New Restaurant</CButton>
       <CTable>
         <CTableHead>
           <CTableRow>
@@ -96,11 +143,11 @@ const Restaurant = () => {
           </CTableRow>
         </CTableHead>
         <CTableBody>
-          {restaurantData.map((restaurant, index) => (
+          {userData.map((user, index) => (
             <CTableRow key={index}>
               {columns.map((column, columnIndex) => (
                 <CTableDataCell key={columnIndex}>
-                  {column.render ? column.render(restaurant[column.dataIndex], restaurant) : restaurant[column.dataIndex]}
+                  {column.render ? column.render(user[column.dataIndex], user) : user[column.dataIndex]}
                 </CTableDataCell>
               ))}
             </CTableRow>
@@ -111,4 +158,4 @@ const Restaurant = () => {
   )
 }
 
-export default Restaurant
+export default User

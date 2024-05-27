@@ -9,135 +9,190 @@ import {
     CButton
 } from '@coreui/react'
 
-const RestaurantEditForm = () => {
+const UserEditForm = () => {
 
-    const {restaurantId} = useParams();
-    const [restaurantData, setRestaurantData] = useState({
-        restaurantName: '',
-        restaurantNit: '',
-        restaurantAddress:'',
-        restaurantPhone: '',
-        cityId: '',
-        city: []
+    const {userId} = useParams();
+    
+    const [userData, setUserData] = useState({
+        userName: '',
+        userPhone: '',
+        userNickName:'',
+        userPassword: '',
+        userAddress: '',
+        userEmail: ''
     });
-    const [departments, setDepartments] = useState([]);
-    const [selectedDepartment, setSelectedDepartment] = useState('');
-    const [cities, setCities] = useState([]);
-    const [selectedCity, setSelectedCity] = useState('');
-    const [hasLoadedRestaurant, setHasLoadedRestaurant] = useState(false);
+    const [hasLoadedUser, setHasLoadedUser] = useState(false);
+    const [hashedPassword, setHashedPassword] = useState('');
     const navigate = useNavigate();
 
     useEffect(()=>{
         
-        const getRestaurant = async() => {
-            const response = await Axios({url: `http://localhost:1337/api/getrestaurant/${restaurantId}`})
-            const restaurant = response.data.data
-            setRestaurantData(restaurant);
-            const departmentId = restaurant.city.departmentId;
-            const cityId = restaurant.cityId;
-            setSelectedDepartment(departmentId);
-            setSelectedCity(cityId);
-            setHasLoadedRestaurant(true);
+        const getUser = async() => {
+            try{
+                // Obtener el token del localStorage
+                const token = localStorage.getItem('token');
+
+                // Verificar si hay un token almacenado
+                if (!token) {
+                    console.log("Token not found in localStorage");
+                    navigate('/login');
+                    return;
+                }
+
+                // Configurar los headers de la solicitud para incluir el token
+                const config = {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                };
+            const response = await Axios.get( `http://localhost:1337/api/getuser/${userId}`, config)
+
+            if(response.status === 200){
+                const user = response.data.data;
+                setUserData({
+                    ...user,
+                    userPassword: ''
+                });
+                setHashedPassword(userData.userPassword)
+                setHasLoadedUser(true)
+            }else{
+                console.log("Error fetching user:", response.statusText);
+            }
+            
+        }catch(error){
+            console.log("Error:", error.message);
+                navigate('/login');
         }
-
-        const getDepartments = async () => {
-            const response = await Axios({url:`http://localhost:1337/api/listdepartment`});
-            const lstDepartments = Object.keys(response.data).map(i=> response.data[i]);
-            setDepartments(lstDepartments.flat());
-        }
-
-        const getCities = async(departmentId)=>{
-            const response = await Axios({url:`http://localhost:1337/api/listcity/${departmentId}`});
-            const lstCities = Object.keys(response.data).map(i=> response.data[i]);
-            setCities(lstCities.flat());
-        }
-
-        getDepartments();
-
-        if(!hasLoadedRestaurant){
-            getRestaurant();
-        }
-
-        if(selectedDepartment !== ""){
-            getCities(selectedDepartment);
-        }
-
-    },[selectedDepartment, restaurantId, hasLoadedRestaurant]);
-
-    function handleSelectDepartments(event){
-        setSelectedDepartment(event.target.value);
     }
 
-    function handleSelectCities(event){
-        setSelectedCity(event.target.value);
-        setRestaurantData({
-            ...restaurantData,
-            cityId: event.target.value
-        })
-    }
+        if(!hasLoadedUser){
+            getUser();
+        }
+        
+    },[ userId, hasLoadedUser, hashedPassword]);
+
 
     function handleChange(event){
         const {name, value} = event.target;
-        setRestaurantData({
-            ...restaurantData,
+        setUserData({
+            ...userData,
             [name]: value
         });
     }
 
     function handleReturn(event){
-        navigate('/restaurants/restaurant');
+        navigate('/users/user');
     }
 
     const handleSubmit = async(event)=>{
         event.preventDefault();
         try{
-            const response = await Axios.put(`http://localhost:1337/api/updaterestaurant/${restaurantId}`, restaurantData);
-            console.log(response.data);
-            navigate('/restaurants/restaurant');
+            // Obtener el token del localStorage
+            const token = localStorage.getItem('token');
+
+            // Verificar si hay un token almacenado
+            if (!token) {
+                console.log("Token not found in localStorage");
+                navigate('/login');
+                return;
+            }
+
+            // Configurar los headers de la solicitud para incluir el token
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+            const response = await Axios.put(`http://localhost:1337/api/updateuser/${userId}`, userData,config);
+
+            // Verificar si la respuesta es exitosa
+            if (response.status === 200) {
+                console.log("car updated successfully");
+                navigate('/users/user');
+            } else {
+                console.log("Error updating community:", response.statusText);
+            }
+            
         }
         catch (e){
-            console.log(e);
+            console.log("Error:", error.message);
+            navigate('/login');
         }
     }
 
-    return(
+    return (
         <CForm className="row g-3" onSubmit={handleSubmit}>
-            <CCol md={12}>
-                <CFormInput type="text" id="restaurantName" name="restaurantName" label="Name" value={restaurantData.restaurantName} onChange={handleChange} />
+            <CCol md={6}>
+                <CFormInput 
+                    type="text" 
+                    id="userName" 
+                    name="userName" 
+                    label="Name" 
+                    value={userData.userName} 
+                    onChange={handleChange} 
+                />
             </CCol>
-            <CCol md={12}>
-                <CFormInput type="text" id="restaurantNit" name="restaurantNit" label="Nit" value={restaurantData.restaurantNit} onChange={handleChange} />
+            <CCol md={6}>
+                <CFormInput 
+                    type="text" 
+                    id="userPhone" 
+                    name="userPhone" 
+                    label="Phone" 
+                    value={userData.userPhone} 
+                    onChange={handleChange} 
+                />
             </CCol>
-            <CCol xs={4}>
-                <CFormSelect id="departmentOptions" label = "Department" value={ selectedDepartment} onChange={handleSelectDepartments} >
-                    <option value="">Select a department</option>
-                    {departments.map(opcion =>(
-                        <option key={opcion.value} value={opcion.value}>{opcion.label}</option>
-                    ))}
-                </CFormSelect>
+            <CCol md={6}>
+                <CFormInput 
+                    type="text" 
+                    id="userNickName" 
+                    name="userNickName" 
+                    label="NickName" 
+                    value={userData.userNickName} 
+                    onChange={handleChange} 
+                />
             </CCol>
-            <CCol xs={4}>
-                <CFormSelect id="cityOptions" label = "City" value={ selectedCity} onChange={handleSelectCities} >
-                    <option value="">Select a city</option>
-                    {cities.map(opcion =>(
-                        <option key={opcion.value} value={opcion.value}>{opcion.label}</option>
-                    ))}
-                </CFormSelect>
+            <CCol md={6}>
+                <CFormInput 
+                    type="text" 
+                    id="userPassword" 
+                    name="userPassword" 
+                    label="Password" 
+                    value={userData.userPassword} 
+                    onChange={handleChange} 
+                />
             </CCol>
-            <CCol xs={4}>
-                <CFormInput type="text" id="restaurantAddress" name="restaurantAddress" label="Address" value={restaurantData.restaurantAddress} onChange={handleChange} />
+            <CCol md={6}>
+                <CFormInput 
+                    type="text" 
+                    id="userAddress" 
+                    name="userAddress" 
+                    label="Address" 
+                    value={userData.userAddress} 
+                    onChange={handleChange} 
+                />
             </CCol>
-            <CCol md={12}>
-                <CFormInput type="text" id="restaurantPhone" name="restaurantPhone" label="Phone" value={restaurantData.restaurantPhone} onChange={handleChange} />
+            <CCol md={6}>
+                <CFormInput 
+                    type="email" 
+                    id="userEmail" 
+                    name="userEmail" 
+                    label="Email" 
+                    value={userData.userEmail} 
+                    onChange={handleChange} 
+                />
             </CCol>
-            <CCol xs={6}>
-                <CButton color="primary" type="submit" >Save</CButton>
+            <CCol md={6}></CCol>
+            <CCol md={1}>
+                <CButton color="primary" type="submit"> Save </CButton>
             </CCol>
-            <CCol xs={6}>
+            <CCol md={1}>
                 <CButton color="secondary" onClick={handleReturn}>Cancel</CButton>
             </CCol>
         </CForm>
-    )
+    );
 }
 
-export default RestaurantEditForm
+export default UserEditForm

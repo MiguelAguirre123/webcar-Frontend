@@ -10,69 +10,124 @@ import {
 
 const ProductEditForm = () => {
     const { productId } = useParams();
-    const [ProductData, setProductData] = useState({
-        productName: '',
+    const [productData, setProductData] = useState({
         productId: '',
+        productName: '',
         productDescription: '',
-        productPrice: '', 
+        productPrice: '',
+        customerId: ''
     });
-
     const [hasLoadedProduct, setHasLoadedProduct] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
         const getProduct = async () => {
-            const response = await Axios.get(`http://localhost:1337/api/getProduct/${productId}`);
-            const product = response.data.data;
-            setProductData(product);
-            setHasLoadedProduct(true);
+            try {
+                // Obtener el token del localStorage
+                const token = localStorage.getItem('token');
+
+                // Verificar si hay un token almacenado
+                if (!token) {
+                    console.log("Token not found in localStorage");
+                    navigate('/login');
+                    return;
+                }
+
+                // Configurar los headers de la solicitud para incluir el token
+                const config = {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                };
+
+                // Enviar la solicitud GET al servidor para obtener el producto
+                const response = await Axios.get(`http://localhost:1337/api/getProduct/${productId}`, config);
+
+                // Verificar si la respuesta es exitosa
+                if (response.status === 200) {
+                    const product = response.data.data;
+                    setProductData(product);
+                    setHasLoadedProduct(true);
+                } else {
+                    console.log("Error fetching product:", response.statusText);
+                }
+            } catch (error) {
+                console.log("Error:", error.message);
+                navigate('/login');
+            }
         };
-        
+
         if (!hasLoadedProduct) {
             getProduct();
         }
-    }, [productId, hasLoadedProduct]);
+    }, [productId, hasLoadedProduct, navigate]);
 
     function handleChange(event) {
         const { name, value } = event.target;
         setProductData({
-            ...ProductData,
+            ...productData,
             [name]: value
         });
     }
 
-    function handleReturn(event) {
-        navigate('/products/product');
+    function handleReturn() {
+        navigate(`/customers/product/${productData.customerId}`);
     }
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const response = await Axios.put(`http://localhost:1337/api/updateproduct/${productId}`, ProductData);
-            console.log(response.data);
-            navigate('/products/product');
+            // Obtener el token del localStorage
+            const token = localStorage.getItem('token');
+
+            // Verificar si hay un token almacenado
+            if (!token) {
+                console.log("Token not found in localStorage");
+                navigate('/login');
+                return;
+            }
+
+            // Configurar los headers de la solicitud para incluir el token
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+
+            // Enviar la solicitud PUT al servidor para actualizar el producto
+            const response = await Axios.put(`http://localhost:1337/api/updateProduct/${productId}`, productData, config);
+
+            // Verificar si la respuesta es exitosa
+            if (response.status === 200) {
+                console.log("Product updated successfully");
+                navigate(`/customers/product/${productData.customerId}`);
+            } else {
+                console.log("Error updating product:", response.statusText);
+            }
+        } catch (error) {
+            console.log("Error:", error.message);
+            navigate('/login');
         }
-        catch (e) {
-            console.log(e);
-        }
-    }
+    };
 
     return (
         <CForm className="row g-3" onSubmit={handleSubmit}>
             <CCol md={12}>
-                <CFormInput type="text" id="productName" name="productName" label="Name" value={ProductData.productName} onChange={handleChange} />
+                <CFormInput type="text" id="productName" name="productName" label="Name" value={productData.productName} onChange={handleChange} />
             </CCol>
             <CCol md={12}>
-                <CFormInput type="text" id="productId" name="productId" label="Id" value={ProductData.productId} onChange={handleChange} />
+                <CFormInput type="text" id="productId" name="productId" label="Id" value={productData.productId} onChange={handleChange} />
             </CCol>
             <CCol xs={12}>
-                <CFormInput type="text" id="productDescription" name="productDescription" label="Description" value={ProductData.productDescription} onChange={handleChange} />
+                <CFormInput type="text" id="productDescription" name="productDescription" label="Description" value={productData.productDescription} onChange={handleChange} />
             </CCol>
             <CCol xs={12}>
-                <CFormInput type="text" id="productPrice" name="productPrice" label="Price" value={ProductData.productPrice} onChange={handleChange} />
+                <CFormInput type="text" id="productPrice" name="productPrice" label="Price" value={productData.productPrice} onChange={handleChange} />
             </CCol>
             <CCol xs={6}>
-                <CButton color="primary" type="submit" >Save</CButton>
+                <CButton color="primary" type="submit">Save</CButton>
             </CCol>
             <CCol xs={6}>
                 <CButton color="secondary" onClick={handleReturn}>Cancel</CButton>
