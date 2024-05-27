@@ -23,15 +23,39 @@ const User = () => {
 
   useEffect(()=>{
     const getUsers = async() =>{
-      const response = await Axios({
-        url: 'http://localhost:1337/api/listusers'
-      });
-      const listUsers = Object.keys(response.data).map(i=> response.data[i]);
-      setUserData(listUsers.flat());
-    }
+      try {
+          // Obtener el token del localStorage
+          const token = localStorage.getItem('token');
+
+          // Verificar si hay un token almacenado
+          if (!token) {
+            console.log("Token not found in localStorage");
+            navigate('/login');
+            return;
+          }
+
+          // Configurar los headers de la solicitud para incluir el token
+          const config = {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          };
+
+          const response = await Axios.get('http://localhost:1337/api/listusers', config);
+          const listUsers = Object.keys(response.data).map(i=> response.data[i]);
+          setUserData(listUsers.flat());
+          console.log("User Data: ", listUsers.flat());
+        } catch (error){
+          console.error("Error fetching users:", error);
+          navigate('/login');
+        }
+    };
 
     getUsers();
   },[]);
+
+
 
   function handleCreateUser(event){
     navigate('/users/userform');
@@ -43,14 +67,38 @@ const User = () => {
 
   const handleDisableUser = async(userId) => {
     try{
-      var url = "http://localhost:1337/api/disableuser/" + userId;
-      const response = await Axios.put(url);
-      window.location.reload();
+      // Obtener el token del localStorage
+      const token = localStorage.getItem('token');
+
+      // Verificar si hay un token almacenado
+      if (!token) {
+        console.log("Token not found in localStorage");
+        navigate('/login');
+        return;
+      }
+
+      // Configurar los headers de la solicitud para incluir el token
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      };
+
+      const url = 'http://localhost:1337/api/disableuser/' + userId;
+      const response = await Axios.put(url,{},config);
+      // Verificar si la respuesta es exitosa
+      if (response.status === 200) {
+        console.log("User disabled successfully");
+        window.location.reload();
+      } else {
+        console.log("Error disabling User:", response.statusText);
+      }
+    } catch (error) {
+      console.log("Error:", error.message);
+      navigate('/login');
     }
-    catch(e){
-      console.log(e)
-    }
-  }
+  };
 
   const columns = [
     {
